@@ -1,0 +1,30 @@
+# Python Validation
+
+[![Build Status](https://travis-ci.org/JOIVY/validation.svg?branch=develop)](https://travis-ci.org/JOIVY/validation)
+[![Coverage Status](https://coveralls.io/repos/github/JOIVY/validation/badge.svg?branch=develop)](https://coveralls.io/github/JOIVY/validation?branch=develop)
+
+A python library for runtime type checking and validation of python values.
+
+
+## Installation
+
+Recommended method is to use the version from [pypi](https://pypi.python.org/pypi/validation):
+
+```
+pip install validation
+```
+
+Please note that this library only supports python version 2.7, and versions 3.4 and later.
+
+
+## Links
+
+- Source code: https://github.com/JOIVY/validation
+- Issue tracker: https://github.com/JOIVY/validation/issues
+- Continuous integration: https://travis-ci.org/JOIVY/validation
+- PyPI: https://pypi.python.org/pypi/validation
+
+
+## License
+
+The project is made available under the terms of the Apache 2.0 license.  See [LICENSE](./LICENSE) for details.
