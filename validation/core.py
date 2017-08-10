@@ -66,9 +66,36 @@ def validate_float(value, min_value=None, max_value=None):
     raise NotImplementedError()
 
 
-@validator
-def validate_bool(value):
-    raise NotImplementedError()
+def _validate_bool(value, required=True):
+    if value is None:
+        if required:
+            raise TypeError("required value is None")
+        return
+
+    if not isinstance(value, bool):
+        raise TypeError((
+            "expected bool, but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+
+def validate_bool(value=_undefined, required=True):
+    """
+    Validator for boolean values.
+
+    :param value:
+        The value to be validated.
+    :param bool required:
+        Whether the value can be `None`.  Defaults to True.
+    """
+    _validate_bool(required)
+
+    def validate(value):
+        _validate_bool(value, required=required)
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
 
 
 @validator
