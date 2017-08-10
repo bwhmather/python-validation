@@ -98,14 +98,129 @@ def validate_bool(value=_undefined, required=True):
         return validate
 
 
-@validator
-def validate_text(value, min_length=None, max_length=None):
-    raise NotImplementedError()
+def _validate_text(value, min_length=None, max_length=None, required=True):
+    if value is None:
+        if required:
+            raise TypeError("required value is None")
+        return
+
+    if not isinstance(value, six.text_type):
+        raise TypeError((
+            "expected unicode string, but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+    if min_length is not None and len(value) < min_length:
+        raise ValueError((
+            "{length} is shorter than minimum acceptable {min}"
+        ).format(length=len(value), min=min_length))
+
+    if max_length is not None and len(value) > max_length:
+        raise ValueError((
+            "{length} is longer than maximum acceptable {max}"
+        ).format(length=len(value), max=max_length))
 
 
-@validator
-def validate_bytes(value, min_length=None, max_length=None):
-    raise NotImplementedError()
+def validate_text(
+    value=_undefined,
+    min_length=None, max_length=None,
+    required=True,
+):
+    """
+    Validator for human readable string values.
+
+    :param unicode value:
+        The string to be validated.
+    :param int min_length:
+        The minimum length of the string.
+    :param int max_length:
+        The maximum acceptable length for the string.  By default, the length
+        is not checked.
+    :param bool required:
+        Whether the value can be `None`.  Defaults to True.
+    """
+    _validate_int(max_length, min_value=0, required=False)
+    # The max_value check here is fine.  If max_length is None then there is no
+    # cap on the min_length.  We do validate max_length first though.
+    _validate_int(
+        min_length, min_value=0, max_value=max_length, required=False,
+    )
+    _validate_bool(required)
+
+    def validate(value):
+        _validate_text(
+            value,
+            min_length=min_length, max_length=max_length,
+            required=required,
+        )
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
+
+
+def _validate_bytes(value, min_length, max_length, required):
+    if value is None:
+        if required:
+            raise TypeError("required value is None")
+        return
+
+    if not isinstance(value, six.binary_type):
+        raise TypeError((
+            "expected byte string, but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+    if min_length is not None and len(value) < min_length:
+        raise ValueError((
+            "{length} is shorter than minimum acceptable {min}"
+        ).format(length=len(value), min=min_length))
+
+    if max_length is not None and len(value) > max_length:
+        raise ValueError((
+            "{length} is longer than maximum acceptable {max}"
+        ).format(length=len(value), max=max_length))
+
+
+def validate_bytes(
+    value=_undefined,
+    min_length=None, max_length=None,
+    required=True,
+):
+    """
+    Validator for bytestring values.
+
+    Should not be used for validating human readable strings,  Please use
+    :function:`validate_string` instead.
+
+    :param bytes value:
+        The string to be validated.
+    :param int min_length:
+        The minimum length of the string.
+    :param int max_length:
+        The maximum acceptable length for the string.  By default, the length
+        is not checked.
+    :param bool required:
+        Whether the value can be `None`.  Defaults to True.
+    """
+    _validate_int(max_length, min_value=0, required=False)
+    # The max_value check here is fine.  If max_length is None then there is no
+    # cap on the min_length.  We do validate max_length first though.
+    _validate_int(
+        min_length, min_value=0, max_value=max_length, required=False,
+    )
+    _validate_bool(required)
+
+    def validate(value):
+        _validate_bytes(
+            value,
+            min_length=min_length, max_length=max_length,
+            required=required,
+        )
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
 
 
 @validator
