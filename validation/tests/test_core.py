@@ -4,7 +4,7 @@ import sys
 
 import six
 
-from validation import validate_int
+from validation import validate_int, validate_bool
 
 
 class ValidateIntTestCase(unittest.TestCase):
@@ -52,7 +52,31 @@ class ValidateFloatTestCase(unittest.TestCase):
 
 
 class ValidateBoolTestCase(unittest.TestCase):
-    pass
+    def test_valid(self):
+        validate_bool(True)
+        validate_bool(False)
+
+    def test_invalid(self):
+        with self.assertRaises(TypeError):
+            validate_bool(1)
+
+        with self.assertRaises(TypeError):
+            validate_bool(0)
+
+        with self.assertRaises(TypeError):
+            validate_bool("true")
+
+    def test_required(self):
+        validate_bool(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_bool(None)
+
+    def test_closure(self):
+        validator = validate_bool()
+        validator(False)
+        with self.assertRaises(TypeError):
+            validator("false")
 
 
 class ValidateTextTestCase(unittest.TestCase):
