@@ -17,7 +17,7 @@ def validator(f):
             f(value, **kwargs)
 
         if value is not _undefined:
-            validate(value, **kwargs)
+            validate(value)
         else:
             return validate
 
