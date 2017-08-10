@@ -23,6 +23,7 @@ setup(
         'Programming Language :: Python :: 3.5',
     ],
     install_requires=[
+        'six >= 1.10, < 2',
     ],
     packages=find_packages(),
     package_data={
