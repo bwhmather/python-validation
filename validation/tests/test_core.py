@@ -4,7 +4,10 @@ import sys
 
 import six
 
-from validation import validate_int, validate_bool
+from validation import (
+    validate_int, validate_bool,
+    validate_text, validate_bytes,
+)
 
 
 class ValidateIntTestCase(unittest.TestCase):
@@ -80,11 +83,69 @@ class ValidateBoolTestCase(unittest.TestCase):
 
 
 class ValidateTextTestCase(unittest.TestCase):
-    pass
+    def test_valid(self):
+        validate_text(u"hello world")
+
+    def test_bytestring(self):
+        with self.assertRaises(TypeError):
+            validate_text(b"hello world")
+
+    def test_min_length(self):
+        validate_text(u"123456", min_length=6)
+
+        with self.assertRaises(ValueError):
+            validate_text(u"123456", min_length=7)
+
+    def test_max_length(self):
+        validate_text(u"123456", max_length=6)
+
+        with self.assertRaises(ValueError):
+            validate_text(u"123456", max_length=5)
+
+    def test_required(self):
+        validate_text(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_text(None)
+
+    def test_closure(self):
+        validator = validate_text(min_length=4)
+        validator(u"12345")
+        with self.assertRaises(ValueError):
+            validator(u"123")
 
 
 class ValidateBytesTestCase(unittest.TestCase):
-    pass
+    def test_valid(self):
+        validate_bytes(b"deadbeaf")
+
+    def test_unicode(self):
+        with self.assertRaises(TypeError):
+            validate_bytes(u"hello world")
+
+    def test_min_length(self):
+        validate_bytes(b"123456", min_length=6)
+
+        with self.assertRaises(ValueError):
+            validate_bytes(b"123456", min_length=7)
+
+    def test_max_length(self):
+        validate_bytes(b"123456", max_length=6)
+
+        with self.assertRaises(ValueError):
+            validate_bytes(b"123456", max_length=5)
+
+    def test_required(self):
+        validate_bytes(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_bytes(None)
+
+    def test_closure(self):
+        validator = validate_bytes(min_length=4)
+        validator(b"12345")
+        with self.assertRaises(ValueError):
+            validator(b"123")
 
 
 class ValidateDateTestCase(unittest.TestCase):
