@@ -9,8 +9,8 @@ def validator(f):
     def wrapper(value=_undefined, **kwargs):
         required = kwargs.pop('required', True)
 
-        def validate(value_):
-            if value_ is None:
+        def validate(value):
+            if value is None:
                 if required:
                     raise TypeError()
                 return
