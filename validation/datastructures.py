@@ -1,26 +1,43 @@
-from .base import validator
+_undefined = object()
 
 
-@validator
-def validate_list(value, validator=None, min_length=None, max_length=None):
+def validate_list(
+    value=_undefined,
+    validator=None,
+    min_length=None, max_length=None,
+    required=True,
+):
     raise NotImplementedError()
 
 
-@validator
-def validate_set(value, validator=None, min_length=None, max_length=None):
+def validate_set(
+    value=_undefined,
+    validator=None,
+    min_length=None, max_length=None,
+    required=True,
+):
     raise NotImplementedError()
 
 
-@validator
-def validate_tuple(value, schema=None):
+def validate_tuple(
+    value=_undefined,
+    schema=None,
+    required=True,
+):
     raise NotImplementedError()
 
 
-@validator
-def validate_dict(value, schema=None, allow_extra=False, default=None):
+def validate_dict(
+    value=_undefined,
+    schema=None, allow_extra=False, default=None,
+    required=True,
+):
     raise NotImplementedError()
 
 
-@validator
-def validate_enum(value, kind):
+def validate_enum(
+    value=_undefined,
+    kind=None,
+    required=True,
+):
     raise NotImplementedError()

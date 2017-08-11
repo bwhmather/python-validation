@@ -1,2 +1,1 @@
 [MASTER]
-load-plugins = validation.plugins.pylint

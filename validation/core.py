@@ -2,8 +2,6 @@ import re
 
 import six
 
-from .base import validator
-
 
 _undefined = object()
 
@@ -63,8 +61,11 @@ def validate_int(
         return validate
 
 
-@validator
-def validate_float(value, min_value=None, max_value=None):
+def validate_float(
+    value=_undefined,
+    min_value=None, max_value=None,
+    required=True,
+):
     raise NotImplementedError()
 
 
@@ -257,11 +258,9 @@ def validate_bytes(
         return validate
 
 
-@validator
-def validate_date(value):
+def validate_date(value=_undefined, required=True):
     raise NotImplementedError()
 
 
-@validator
-def validate_datetime(value):
+def validate_datetime(value=_undefined, required=True):
     raise NotImplementedError()
