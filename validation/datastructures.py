@@ -1,9 +1,42 @@
+import sys
+
 import six
 
 from .core import _validate_int, _validate_bool
 
 
 _undefined = object()
+
+
+def _try_contextualize_exception(context):
+    """
+    Attempts to re-raise a `TypeError` or `ValueError` with a description of
+    the context.
+
+    If the original error does not match the expected form, will simply return
+    without raising anything.
+    """
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+
+    if exc_type not in (TypeError, ValueError):
+        # No safe way to extend the message for subclasses.
+        return
+
+    # Check that the exception has been properly constructed.  The
+    # documentation requires that :exception:`TypeError`s and
+    # :exception:`ValueError`s are constructed with a single,
+    # string argument, but this is not enforced anywhere.
+    if len(exc_value.args) != 1:
+        return
+
+    if not isinstance(exc_value.args[0], str):
+        return
+
+    message = "{context}: {message}".format(
+        context=context, message=exc_value.args[0],
+    )
+
+    six.raise_from(exc_type(message), exc_value)
 
 
 def _validate_list(
@@ -177,44 +210,20 @@ def _validate_mapping(
         if key_validator is not None:
             try:
                 key_validator(item_key)
-            except (TypeError, ValueError) as exc:
-                if type(exc) not in (TypeError, ValueError):
-                    # No safe way to extend the message for subclasses.
-                    raise
-
-                # Check that the exception has been properly constructed.  The
-                # documentation requires that :exception:`TypeError`s and
-                # :exception:`ValueError`s are constructed with a single,
-                # string argument, but this is not enforced anywhere.
-                assert len(exc.args) == 1
-                assert isinstance(exc.args[0], str)
-
-                message = "invalid key {key!r}: {message}".format(
-                    key=item_key, message=exc.args[0],
+            except (TypeError, ValueError):
+                _try_contextualize_exception(
+                    "invalid key {key!r}".format(key=item_key),
                 )
-
-                six.raise_from(type(exc)(message), exc)
+                raise
 
         if value_validator is not None:
             try:
                 value_validator(item_value)
-            except (TypeError, ValueError) as exc:
-                if type(exc) not in (TypeError, ValueError):
-                    # No safe way to extend the message for subclasses.
-                    raise
-
-                # Check that the exception has been properly constructed.  The
-                # documentation requires that :exception:`TypeError`s and
-                # :exception:`ValueError`s are constructed with a single,
-                # string argument, but this is not enforced anywhere.
-                assert len(exc.args) == 1
-                assert isinstance(exc.args[0], str)
-
-                message = "invalid value for key {key!r}: {message}".format(
-                    key=item_key, message=exc.args[0],
+            except (TypeError, ValueError):
+                _try_contextualize_exception(
+                    "invalid value for key {key!r}".format(key=item_key),
                 )
-
-                six.raise_from(type(exc)(message), exc)
+                raise
 
 
 def validate_mapping(
@@ -277,23 +286,11 @@ def _validate_structure(
 
             try:
                 validator(value=value[key])
-            except (TypeError, ValueError) as exc:
-                if type(exc) not in (TypeError, ValueError):
-                    # No safe way to extend the message for subclasses.
-                    raise
-
-                # Check that the exception has been properly constructed.  The
-                # documentation requires that :exception:`TypeError`s and
-                # :exception:`ValueError`s are constructed with a single,
-                # string argument, but this is not enforced anywhere.
-                assert len(exc.args) == 1
-                assert isinstance(exc.args[0], str)
-
-                message = "invalid value for key {key!r}: {message}".format(
-                    key=key, message=exc.args[0],
+            except (TypeError, ValueError):
+                _try_contextualize_exception(
+                    "invalid value for key {key!r}".format(key=key),
                 )
-
-                six.raise_from(type(exc)(message), exc)
+                raise
 
         if not allow_extra and set(schema) != set(value):
             raise ValueError((
