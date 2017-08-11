@@ -15,7 +15,7 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
 
     if not isinstance(value, six.integer_types):
         raise TypeError((
-            "expected int, but value is of type {cls!r}"
+            "expected 'int', but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
     if min_value is not None and value < min_value:
@@ -78,7 +78,7 @@ def _validate_bool(value, required=True):
 
     if not isinstance(value, bool):
         raise TypeError((
-            "expected bool, but value is of type {cls!r}"
+            "expected 'bool', but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
 
@@ -270,7 +270,7 @@ def _validate_date(value, required=True):
     # seconds, etc) and is usually presented in a very different way.
     if not isinstance(value, date) or isinstance(value, datetime):
         raise TypeError((
-            "expected date, but value is of type {cls!r}"
+            "expected 'date', but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
 
@@ -300,7 +300,7 @@ def _validate_datetime(value, required=True):
 
     if not isinstance(value, datetime):
         raise TypeError((
-            "expected datetime, but value is of type {cls!r}"
+            "expected 'datetime', but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
     if value.tzinfo is None:

@@ -51,7 +51,7 @@ def _validate_list(
 
     if not isinstance(value, list):
         raise TypeError((
-            "expected list, got {cls!r}"
+            "expected 'list', value is of type {cls!r}"
         ).format(cls=type(value).__name__))
 
     if min_length is not None and len(value) < min_length:
@@ -127,7 +127,7 @@ def _validate_set(
 
     if not isinstance(value, set):
         raise TypeError((
-            "expected set, got {cls!r}"
+            "expected 'set', but value is of type {cls!r}"
         ).format(cls=type(value).__name__))
 
     if min_length is not None and len(value) < min_length:
