@@ -1,4 +1,5 @@
 import re
+from datetime import date, datetime
 
 import six
 
@@ -258,9 +259,69 @@ def validate_bytes(
         return validate
 
 
+def _validate_date(value, required=True):
+    if value is None:
+        if required:
+            raise TypeError("required value is None")
+        return
+
+    # :class:`datetime` is a subclass of :class:`date`, but we really don't
+    # want to accept it as it behaves very differently (timezones, leap
+    # seconds, etc) and is usually presented in a very different way.
+    if not isinstance(value, date) or isinstance(value, datetime):
+        raise TypeError((
+            "expected date, but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+
 def validate_date(value=_undefined, required=True):
-    raise NotImplementedError()
+    """
+    Checks that the value is a valid :class:`datetime.date` value.
+
+    :param datetime.date value:
+        The value to be validated.
+    :param bool required:
+        Whether the value can be `None`.  Defaults to True.
+    """
+    def validate(value):
+        _validate_date(value, required=required)
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
+
+
+def _validate_datetime(value, required=True):
+    if value is None:
+        if required:
+            raise TypeError("required value is None")
+        return
+
+    if not isinstance(value, datetime):
+        raise TypeError((
+            "expected datetime, but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+    if value.tzinfo is None:
+        raise ValueError((
+            "datetime object is missing timezone"
+        ))
 
 
 def validate_datetime(value=_undefined, required=True):
-    raise NotImplementedError()
+    """
+    Checks that the value is a valid :class:`datetime.datetime` value.
+
+    :param datetime.date value:
+        The value to be validated.
+    :param bool required:
+        Whether the value can be `None`.  Defaults to True.
+    """
+    def validate(value):
+        _validate_datetime(value, required=required)
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
