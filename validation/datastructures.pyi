@@ -44,20 +44,26 @@ def validate_set(
     ...
 
 
+K = TypeVar('K')
+V = TypeVar('V')
+
+
 @overload
-def validate_tuple(
-    value: Tuple,
+def validate_mapping(
+    value: Dict[K, V],
     *, required: bool=False,
-    schema: Tuple=None,
+    key_validator: Callable[[K], None]=None,
+    value_validator: Callable[[V], None]=None,
 ) -> None:
     ...
 
 
 @overload
-def validate_tuple(
+def validate_mapping(
     *, required: bool=False,
-    schema: Tuple=None,
-) -> Callable[[Tuple], None]:
+    key_validator: Callable[[K], None]=None,
+    value_validator: Callable[[V], None]=None,
+) -> Callable[[Dict[K, V]], None]:
     ...
 
 
@@ -76,6 +82,23 @@ def validate_structure(
     *, allow_extra: bool=False,
     schema: Dict=None,
     required: bool=False,
+) -> Callable[[Tuple], None]:
+    ...
+
+
+@overload
+def validate_tuple(
+    value: Tuple,
+    *, required: bool=False,
+    schema: Tuple=None,
+) -> None:
+    ...
+
+
+@overload
+def validate_tuple(
+    *, required: bool=False,
+    schema: Tuple=None,
 ) -> Callable[[Tuple], None]:
     ...
 

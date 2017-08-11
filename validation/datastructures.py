@@ -158,14 +158,6 @@ def validate_set(
         return validate
 
 
-def validate_tuple(
-    value=_undefined,
-    schema=None,
-    required=True,
-):
-    raise NotImplementedError()
-
-
 def _validate_mapping(
     value,
     key_validator=None, value_validator=None,
@@ -358,6 +350,14 @@ def validate_structure(
         validate(value)
     else:
         return validate
+
+
+def validate_tuple(
+    value=_undefined,
+    schema=None,
+    required=True,
+):
+    raise NotImplementedError()
 
 
 def validate_enum(
