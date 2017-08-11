@@ -3,7 +3,7 @@ import unittest
 from validation import (
     validate_int, validate_text,
     validate_list, validate_set,
-    validate_structure,
+    validate_mapping, validate_structure,
 )
 
 
@@ -98,7 +98,64 @@ class ValidateSetTestCase(unittest.TestCase):
 
 
 class ValidateMappingTestCase(unittest.TestCase):
-    pass
+    def test_basic_valid(self):
+        validate_mapping({
+            "key1": 1,
+            "key2": 2,
+        })
+
+    def test_valid_keys(self):
+        validate_mapping({
+            u"key1": 1,
+            u"key2": 2,
+        }, key_validator=validate_text())
+
+    def test_invalid_key_type(self):
+        with self.assertRaises(TypeError):
+            validate_mapping({
+                u"key1": 1,
+                u"key2": 2,
+            }, key_validator=validate_int())
+
+    def test_invalid_key(self):
+        with self.assertRaises(ValueError):
+            validate_mapping({
+                u"key1": 1,
+                u"key2": 2,
+            }, key_validator=validate_text(min_length=20))
+
+    def test_invalid_value_type(self):
+        with self.assertRaises(TypeError):
+            validate_mapping({
+                u"key1": "1",
+                u"key2": "2",
+            }, value_validator=validate_int())
+
+    def test_invalid_value(self):
+        with self.assertRaises(ValueError):
+            validate_mapping({
+                u"key1": 1,
+                u"key2": 2,
+            }, value_validator=validate_int(max_value=1))
+
+    def test_invalid_type(self):
+        with self.assertRaises(TypeError):
+            validate_mapping([
+                (u"key1", 1),
+                (u"key2", 2),
+            ])
+
+    def test_required(self):
+        validate_mapping(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_mapping(None)
+
+    def test_closure(self):
+        validator = validate_mapping(key_validator=validate_int())
+        validator({1: 2})
+        with self.assertRaises(TypeError):
+            validator({"1": 1})
 
 
 class ValidateStructureTestCase(unittest.TestCase):
