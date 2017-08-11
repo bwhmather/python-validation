@@ -291,7 +291,7 @@ def _validate_structure(
                 ).format(key=key, dictionary=value))
 
             try:
-                validator(value=value[key])
+                validator(value[key])
             except (TypeError, ValueError):
                 _try_contextualize_exception(
                     "invalid value for key {key!r}".format(key=key),

@@ -124,6 +124,12 @@ class ValidateMappingTestCase(unittest.TestCase):
                 u"key2": 2,
             }, key_validator=validate_text(min_length=20))
 
+    def test_key_validator_positional_argument(self):
+        def validator(*args):
+            assert len(args) == 1
+
+        validate_mapping({"key": "value"}, key_validator=validator)
+
     def test_invalid_value_type(self):
         with self.assertRaises(TypeError):
             validate_mapping({
@@ -137,6 +143,12 @@ class ValidateMappingTestCase(unittest.TestCase):
                 u"key1": 1,
                 u"key2": 2,
             }, value_validator=validate_int(max_value=1))
+
+    def test_value_validator_positional_argument(self):
+        def validator(*args):
+            assert len(args) == 1
+
+        validate_mapping({"key": "value"}, value_validator=validator)
 
     def test_invalid_type(self):
         with self.assertRaises(TypeError):
@@ -193,6 +205,12 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'hello': u"world",
                 'count': -1,
             })
+
+    def test_schema_positional_argument(self):
+        def validator(*args):
+            assert len(args) == 1
+
+        validate_structure({"key": "value"}, schema={"key": validator})
 
     def test_schema_unexpected_key(self):
         validator = validate_structure(schema={
