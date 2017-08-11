@@ -102,6 +102,15 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_text(u"123456", max_length=5)
 
+    def test_pattern(self):
+        validate_text(u"a----b", pattern=r"a-*b")
+
+        with self.assertRaises(ValueError):
+            validate_text(u"begin end", pattern=r"end")
+
+        with self.assertRaises(ValueError):
+            validate_text(u"begin end", pattern=r"begin")
+
     def test_required(self):
         validate_text(None, required=False)
 

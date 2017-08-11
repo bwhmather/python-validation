@@ -1,4 +1,4 @@
-from typing import Callable, overload
+from typing import Union, overload, Callable, Pattern
 from datetime import date, datetime
 
 
@@ -55,6 +55,7 @@ def validate_bool(
 def validate_text(
     value: str,
     *, min_length: int=None, max_length: int=None,
+    pattern: Union[str, Pattern]=None,
     required: bool=True,
 ) -> None:
     ...
@@ -63,6 +64,7 @@ def validate_text(
 @overload
 def validate_text(
     *, min_length: int=None, max_length: int=None,
+    pattern: Union[str, Pattern]=None,
     required: bool=True,
 ) -> Callable[[str], None]:
     ...

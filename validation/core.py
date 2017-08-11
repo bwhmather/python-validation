@@ -1,3 +1,5 @@
+import re
+
 import six
 
 from .base import validator
@@ -98,7 +100,12 @@ def validate_bool(value=_undefined, required=True):
         return validate
 
 
-def _validate_text(value, min_length=None, max_length=None, required=True):
+def _validate_text(
+    value,
+    min_length=None, max_length=None,
+    pattern=None,
+    required=True,
+):
     if value is None:
         if required:
             raise TypeError("required value is None")
@@ -119,10 +126,24 @@ def _validate_text(value, min_length=None, max_length=None, required=True):
             "{length} is longer than maximum acceptable {max}"
         ).format(length=len(value), max=max_length))
 
+    if pattern is not None:
+        # Unfortunately `fullmatch` is not available in python2.
+        match = pattern.match(value)
+
+        if not (
+            match is not None and
+            match.start() == 0 and
+            match.end() == len(value)
+        ):
+            raise ValueError(
+                "string did not match pattern"
+            )
+
 
 def validate_text(
     value=_undefined,
     min_length=None, max_length=None,
+    pattern=None,
     required=True,
 ):
     """
@@ -135,6 +156,8 @@ def validate_text(
     :param int max_length:
         The maximum acceptable length for the string.  By default, the length
         is not checked.
+    :param str|re.SRE_Pattern pattern:
+        Regular expression to check the value against.
     :param bool required:
         Whether the value can be `None`.  Defaults to True.
     """
@@ -146,10 +169,21 @@ def validate_text(
     )
     _validate_bool(required)
 
+    if pattern is not None:
+        # Note that we are a little more permissive about non-unicode patterns
+        # in python2 than we are about non-unicode arguments.  Users will
+        # probably written the pattern argument inline.
+        if isinstance(pattern, six.string_types):
+            pattern = re.compile(pattern)
+
+        # `re` does not expose a class for regular expression objects, so it
+        # is not possible to do any validation here.
+
     def validate(value):
         _validate_text(
             value,
             min_length=min_length, max_length=max_length,
+            pattern=pattern,
             required=required,
         )
 
