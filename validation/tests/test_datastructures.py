@@ -3,7 +3,7 @@ import unittest
 from validation import (
     validate_int, validate_text,
     validate_list, validate_set,
-    validate_dict,
+    validate_structure,
 )
 
 
@@ -103,10 +103,10 @@ class ValidateTupleTestCase(unittest.TestCase):
 
 class ValidateDictTestCase(unittest.TestCase):
     def test_basic_valid(self):
-        validate_dict({'hello': "world"})
+        validate_structure({'hello': "world"})
 
     def test_schema_valid(self):
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'hello': validate_text(),
             'count': validate_int(),
         })
@@ -114,7 +114,7 @@ class ValidateDictTestCase(unittest.TestCase):
         validator({'hello': u"world", 'count': 2})
 
     def test_schema_invalid_value_type(self):
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'hello': validate_text(),
             'count': validate_int(),
         })
@@ -126,7 +126,7 @@ class ValidateDictTestCase(unittest.TestCase):
             })
 
     def test_schema_invalid_value(self):
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'hello': validate_text(),
             'count': validate_int(min_value=0),
         })
@@ -138,7 +138,7 @@ class ValidateDictTestCase(unittest.TestCase):
             })
 
     def test_schema_unexpected_key(self):
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'expected': validate_int(),
         })
 
@@ -149,7 +149,7 @@ class ValidateDictTestCase(unittest.TestCase):
             })
 
     def test_schema_allow_extra(self):
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'expected': validate_int(),
         }, allow_extra=True)
 

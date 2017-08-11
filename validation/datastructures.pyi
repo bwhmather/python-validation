@@ -62,7 +62,7 @@ def validate_tuple(
 
 
 @overload
-def validate_dict(
+def validate_structure(
     value: Dict,
     *, allow_extra: bool=False,
     schema: Dict=None,
@@ -72,7 +72,7 @@ def validate_dict(
 
 
 @overload
-def validate_dict(
+def validate_structure(
     *, allow_extra: bool=False,
     schema: Dict=None,
     required: bool=False,

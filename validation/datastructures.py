@@ -166,7 +166,7 @@ def validate_tuple(
     raise NotImplementedError()
 
 
-def _validate_dict(
+def _validate_structure(
     value,
     schema=None, allow_extra=False,
     required=True,
@@ -214,13 +214,14 @@ def _validate_dict(
             ).format(unexpected=set(value) - set(schema)))
 
 
-def validate_dict(
+def validate_structure(
     value=_undefined,
     schema=None, allow_extra=False,
     required=True,
 ):
     """
-    Validates a dictionary, checking it against an optional schema.
+    Validates a structured dictionary, with value types depending on the key,
+    checking it against an optional schema.
 
     The schema should be a dictionary, with keys corresponding to the expected
     keys in `value`, but with the values replaced by functions which will be
@@ -228,7 +229,7 @@ def validate_dict(
 
     A simple example:
 
-        validator = validate_dict(schema={
+        validator = validate_structure(schema={
             'id': validate_key(kind='Model'),
             'count': validate_int(min=0),
         })
@@ -243,7 +244,7 @@ def validate_dict(
     :param bool required:
         Whether the value can't be `None`. Defaults to True.
     """
-    _validate_dict(schema, schema=None, required=False)
+    _validate_structure(schema, schema=None, required=False)
     _validate_bool(allow_extra)
     _validate_bool(required)
 
@@ -252,7 +253,7 @@ def validate_dict(
         schema = dict(schema)
 
     def validate(value):
-        _validate_dict(
+        _validate_structure(
             value,
             schema=schema, allow_extra=allow_extra,
             required=required,
