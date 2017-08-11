@@ -1,0 +1,12 @@
+# Exclude everything by default.  Require individual files to be whitelisted.
+global-exclude *
+
+# Include python files.
+include setup.py
+recursive-include validation *.py
+
+# Include type annotation stub files.
+recursive-include validation *.pyi
+
+# Include documentation.
+include README.mkd LICENSE
