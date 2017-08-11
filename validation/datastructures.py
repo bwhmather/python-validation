@@ -67,8 +67,14 @@ def _validate_list(
         ).format(expected=max_length, actual=len(value)))
 
     if validator is not None:
-        for item in value:
-            validator(item)
+        for index, item in enumerate(value):
+            try:
+                validator(item)
+            except (TypeError, ValueError):
+                _try_contextualize_exception(
+                    "invalid item at position {index}".format(index=index),
+                )
+                raise
 
 
 def validate_list(
