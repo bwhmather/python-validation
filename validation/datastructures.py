@@ -166,6 +166,101 @@ def validate_tuple(
     raise NotImplementedError()
 
 
+def _validate_mapping(
+    value,
+    key_validator=None, value_validator=None,
+    required=True,
+):
+    if value is None:
+        if not required:
+            return
+        raise TypeError("required value is None")
+
+    if not isinstance(value, dict):
+        raise TypeError((
+            "Expected dictionary but the type is {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+    for item_key, item_value in value.items():
+        if key_validator is not None:
+            try:
+                key_validator(item_key)
+            except (TypeError, ValueError) as exc:
+                if type(exc) not in (TypeError, ValueError):
+                    # No safe way to extend the message for subclasses.
+                    raise
+
+                # Check that the exception has been properly constructed.  The
+                # documentation requires that :exception:`TypeError`s and
+                # :exception:`ValueError`s are constructed with a single,
+                # string argument, but this is not enforced anywhere.
+                assert len(exc.args) == 1
+                assert isinstance(exc.args[0], str)
+
+                message = "invalid key {key!r}: {message}".format(
+                    key=item_key, message=exc.args[0],
+                )
+
+                six.raise_from(type(exc)(message), exc)
+
+        if value_validator is not None:
+            try:
+                value_validator(item_value)
+            except (TypeError, ValueError) as exc:
+                if type(exc) not in (TypeError, ValueError):
+                    # No safe way to extend the message for subclasses.
+                    raise
+
+                # Check that the exception has been properly constructed.  The
+                # documentation requires that :exception:`TypeError`s and
+                # :exception:`ValueError`s are constructed with a single,
+                # string argument, but this is not enforced anywhere.
+                assert len(exc.args) == 1
+                assert isinstance(exc.args[0], str)
+
+                message = "invalid value for key {key!r}: {message}".format(
+                    key=item_key, message=exc.args[0],
+                )
+
+                six.raise_from(type(exc)(message), exc)
+
+
+def validate_mapping(
+    value=_undefined,
+    key_validator=None, value_validator=None,
+    required=True,
+):
+    """
+    Validates a dictionary representing a simple mapping from keys of one type
+    to values of another.
+
+    :param dict value:
+        The value to be validated.
+    :param func key_validator:
+        Optional function to be call to check each of the keys in the
+        dictionary.
+    :param func value_validator:
+        Optional function to be call to check each of the values in the
+        dictionary.
+    :param bool required:
+        Whether the value can't be `None`. Defaults to `True`.
+    """
+    _validate_bool(required)
+
+    def validate(value):
+        _validate_mapping(
+            value,
+            key_validator=key_validator,
+            value_validator=value_validator,
+            required=required,
+        )
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
+
+
 def _validate_structure(
     value,
     schema=None, allow_extra=False,
