@@ -25,6 +25,9 @@ setup(
     install_requires=[
         'six >= 1.10, < 2',
     ],
+    tests_require=[
+        'pytz',
+    ],
     packages=find_packages(),
     package_data={
         '': ['*.*'],
