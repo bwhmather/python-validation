@@ -97,11 +97,11 @@ class ValidateSetTestCase(unittest.TestCase):
             validator({1, 2, 3, 4})
 
 
-class ValidateTupleTestCase(unittest.TestCase):
+class ValidateMappingTestCase(unittest.TestCase):
     pass
 
 
-class ValidateDictTestCase(unittest.TestCase):
+class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
         validate_structure({'hello': "world"})
 
@@ -157,6 +157,10 @@ class ValidateDictTestCase(unittest.TestCase):
             'expected': 1,
             'unexpected': 2,
         })
+
+
+class ValidateTupleTestCase(unittest.TestCase):
+    pass
 
 
 class ValidateEnumTestCase(unittest.TestCase):
