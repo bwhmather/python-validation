@@ -1,12 +1,15 @@
 import unittest
 
 import sys
+from datetime import date, datetime
 
 import six
+import pytz
 
 from validation import (
     validate_int, validate_bool,
     validate_text, validate_bytes,
+    validate_date, validate_datetime
 )
 
 
@@ -158,8 +161,54 @@ class ValidateBytesTestCase(unittest.TestCase):
 
 
 class ValidateDateTestCase(unittest.TestCase):
-    pass
+    def test_valid(self):
+        validate_date(date.today())
+
+    def test_datetime(self):
+        with self.assertRaises(TypeError):
+            validate_date(datetime.now())
+
+    def test_invalid_type(self):
+        with self.assertRaises(TypeError):
+            validate_date("1970-01-01")
+
+    def test_required(self):
+        validate_date(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_date(None)
+
+    def test_closure(self):
+        validator = validate_date()
+        validator(date.today())
+        with self.assertRaises(TypeError):
+            validator(datetime.now())
 
 
 class ValidateDateTimeTestCase(unittest.TestCase):
-    pass
+    def test_valid(self):
+        validate_datetime(datetime.now(pytz.utc))
+
+    def test_no_timezone(self):
+        with self.assertRaises(ValueError):
+            validate_datetime(datetime.now())
+
+    def test_date(self):
+        with self.assertRaises(TypeError):
+            validate_datetime(date.today())
+
+    def test_invalid_type(self):
+        with self.assertRaises(TypeError):
+            validate_date("1970-01-01T12:00:00+00:00")
+
+    def test_required(self):
+        validate_date(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_date(None)
+
+    def test_closure(self):
+        validator = validate_date()
+        validator(date.today())
+        with self.assertRaises(TypeError):
+            validator(datetime.now())
