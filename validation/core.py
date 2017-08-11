@@ -20,12 +20,12 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
 
     if min_value is not None and value < min_value:
         raise ValueError((
-            "{value!r} is less than minimum acceptable {min!r}"
+            "expected value less than {min}, but got {value}"
         ).format(value=value, min=min_value))
 
     if max_value is not None and value > max_value:
         raise ValueError((
-            "{value!r} is greater than maximum acceptable {max!r}"
+            "expected value greater than {max}, but got {value}"
         ).format(value=value, max=max_value))
 
 
@@ -120,12 +120,14 @@ def _validate_text(
 
     if min_length is not None and len(value) < min_length:
         raise ValueError((
-            "{length} is shorter than minimum acceptable {min}"
+            "expected at least {min} characters, but string is only "
+            "{length} characters long"
         ).format(length=len(value), min=min_length))
 
     if max_length is not None and len(value) > max_length:
         raise ValueError((
-            "{length} is longer than maximum acceptable {max}"
+            "expected at most {max} characters, but string is {length} "
+            "characters long"
         ).format(length=len(value), max=max_length))
 
     if pattern is not None:
@@ -208,12 +210,13 @@ def _validate_bytes(value, min_length, max_length, required):
 
     if min_length is not None and len(value) < min_length:
         raise ValueError((
-            "{length} is shorter than minimum acceptable {min}"
+            "expected at least {min} bytes, but bytestring contains only "
+            "{length}"
         ).format(length=len(value), min=min_length))
 
     if max_length is not None and len(value) > max_length:
         raise ValueError((
-            "{length} is longer than maximum acceptable {max}"
+            "expected at most {max} bytes, but bytestring contains {length}"
         ).format(length=len(value), max=max_length))
 
 

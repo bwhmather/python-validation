@@ -32,7 +32,7 @@ def _try_contextualize_exception(context):
     if not isinstance(exc_value.args[0], str):
         return
 
-    message = "{context}: {message}".format(
+    message = "{context}:  {message}".format(
         context=context, message=exc_value.args[0],
     )
 
@@ -57,13 +57,13 @@ def _validate_list(
     if min_length is not None and len(value) < min_length:
         raise ValueError((
             "expected at least {expected} elements, "
-            "but list is of length {actual}"
+            "but list contains only {actual}"
         ).format(expected=min_length, actual=len(value)))
 
     if max_length is not None and len(value) > max_length:
         raise ValueError((
             "expected at most {expected} elements, "
-            "but list is of length {actual}"
+            "but list contains {actual}"
         ).format(expected=max_length, actual=len(value)))
 
     if validator is not None:
@@ -132,13 +132,13 @@ def _validate_set(
 
     if min_length is not None and len(value) < min_length:
         raise ValueError((
-            "expected at least {expected} elements, "
+            "expected at least {expected} entries, "
             "but set contains only {actual}"
         ).format(expected=min_length, actual=len(value)))
 
     if max_length is not None and len(value) > max_length:
         raise ValueError((
-            "expected at most {expected} elements, "
+            "expected at most {expected} entries, "
             "but set contains {actual}"
         ).format(expected=max_length, actual=len(value)))
 
@@ -203,7 +203,7 @@ def _validate_mapping(
 
     if not isinstance(value, dict):
         raise TypeError((
-            "Expected dictionary but the type is {cls!r}"
+            "expected 'dict', but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
     for item_key, item_value in value.items():
@@ -274,14 +274,14 @@ def _validate_structure(
 
     if not isinstance(value, dict):
         raise TypeError((
-            "Expected dictionary but the type is {cls!r}"
+            "expected 'dict' but value is of type {cls!r}"
         ).format(cls=value.__class__.__name__))
 
     if schema is not None:
         for key, validator in schema.items():
             if key not in value:
                 raise ValueError((
-                    "key {key} missing from dictionary {dictionary!r}"
+                    "dictionary missing expected key: {key!r}"
                 ).format(key=key, dictionary=value))
 
             try:
@@ -294,8 +294,13 @@ def _validate_structure(
 
         if not allow_extra and set(schema) != set(value):
             raise ValueError((
-                "encountered unexpected keys: {unexpected!r}"
-            ).format(unexpected=set(value) - set(schema)))
+                "dictionary contains unexpected keys: {unexpected}"
+            ).format(
+                unexpected=', '.join(
+                    repr(unexpected)
+                    for unexpected in set(value) - set(schema)
+                )
+            ))
 
 
 def validate_structure(
