@@ -1,8 +1,9 @@
 import unittest
 
 from validation import (
-    validate_int,
+    validate_int, validate_text,
     validate_list, validate_set,
+    validate_dict,
 )
 
 
@@ -101,7 +102,61 @@ class ValidateTupleTestCase(unittest.TestCase):
 
 
 class ValidateDictTestCase(unittest.TestCase):
-    pass
+    def test_basic_valid(self):
+        validate_dict({'hello': "world"})
+
+    def test_schema_valid(self):
+        validator = validate_dict(schema={
+            'hello': validate_text(),
+            'count': validate_int(),
+        })
+
+        validator({'hello': u"world", 'count': 2})
+
+    def test_schema_invalid_value_type(self):
+        validator = validate_dict(schema={
+            'hello': validate_text(),
+            'count': validate_int(),
+        })
+
+        with self.assertRaises(TypeError):
+            validator({
+                'hello': u"world",
+                'count': "one hundred",
+            })
+
+    def test_schema_invalid_value(self):
+        validator = validate_dict(schema={
+            'hello': validate_text(),
+            'count': validate_int(min_value=0),
+        })
+
+        with self.assertRaises(ValueError):
+            validator({
+                'hello': u"world",
+                'count': -1,
+            })
+
+    def test_schema_unexpected_key(self):
+        validator = validate_dict(schema={
+            'expected': validate_int(),
+        })
+
+        with self.assertRaises(ValueError):
+            validator({
+                'expected': 1,
+                'unexpected': 2,
+            })
+
+    def test_schema_allow_extra(self):
+        validator = validate_dict(schema={
+            'expected': validate_int(),
+        }, allow_extra=True)
+
+        validator({
+            'expected': 1,
+            'unexpected': 2,
+        })
 
 
 class ValidateEnumTestCase(unittest.TestCase):
