@@ -18,7 +18,7 @@ def _try_contextualize_exception(context):
     """
     exc_type, exc_value, exc_traceback = sys.exc_info()
 
-    if exc_type not in (TypeError, ValueError):
+    if exc_type not in (TypeError, ValueError, KeyError):
         # No safe way to extend the message for subclasses.
         return
 
@@ -70,7 +70,7 @@ def _validate_list(
         for index, item in enumerate(value):
             try:
                 validator(item)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, KeyError):
                 _try_contextualize_exception(
                     "invalid item at position {index}".format(index=index),
                 )
@@ -216,7 +216,7 @@ def _validate_mapping(
         if key_validator is not None:
             try:
                 key_validator(item_key)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, KeyError):
                 _try_contextualize_exception(
                     "invalid key {key!r}".format(key=item_key),
                 )
@@ -225,7 +225,7 @@ def _validate_mapping(
         if value_validator is not None:
             try:
                 value_validator(item_value)
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, KeyError):
                 _try_contextualize_exception(
                     "invalid value for key {key!r}".format(key=item_key),
                 )
@@ -292,7 +292,7 @@ def _validate_structure(
 
             try:
                 validator(value[key])
-            except (TypeError, ValueError):
+            except (TypeError, ValueError, KeyError):
                 _try_contextualize_exception(
                     "invalid value for key {key!r}".format(key=key),
                 )
