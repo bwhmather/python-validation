@@ -9,4 +9,4 @@ recursive-include validation *.py
 recursive-include validation *.pyi
 
 # Include documentation.
-include README.mkd LICENSE
+include README.rst LICENSE

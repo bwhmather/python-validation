@@ -1,18 +1,21 @@
-# Python Validation
+Python Validation
+=================
 
-[![Build Status](https://travis-ci.org/JOIVY/validation.svg?branch=develop)](https://travis-ci.org/JOIVY/validation)
-[![Coverage Status](https://coveralls.io/repos/github/JOIVY/validation/badge.svg?branch=develop)](https://coveralls.io/github/JOIVY/validation?branch=develop)
+|build-status| |coverage|
 
 A python library for runtime type checking and validation of python values.
 
 Intended as a stepping stone to static typing.
 
 
-## Usage
+Usage
+-----
 
 All validators are functions which take a single value to check as their
 first argument, check its type and that it meets some preconditions, and raises
 an exception if it finds something wrong.
+
+.. code:: python
 
     >>> validation.validate_int(1)
     >>> validation.validate_int(1.5)
@@ -27,6 +30,8 @@ an exception if it finds something wrong.
 If the first argument is missing, validators will return a closure that can be
 called later to check a value.
 
+.. code:: python
+
     >>> validator = validation.validate_int(min_value=0)
     >>> validator(-1)
     Traceback (most recent call last):
@@ -37,6 +42,8 @@ This is important when using the datastructure validators.
 Datastructure validators usually accept as an argument a function to be applied
 to each of the values they contain.
 
+.. code:: python
+
     >>> value = [1, -2]
     >>> validate_list(value, validator=lambda v: validate_int(v, min_value=0))
     Traceback (most recent call last):
@@ -45,6 +52,7 @@ to each of the values they contain.
 
 This can be expressed more succinctly as:
 
+.. code:: python
     >>> value = [1, -2]
     >>> validate_list(value, validator=validate_int(min_value=0))
     Traceback (most recent call last):
@@ -61,6 +69,8 @@ variables.
 It does not prevent you from writing more checks in normal python!
 As an example, to validate two mutually exclusive arguments:
 
+.. code:: python
+
     def do_something(arg_a=None, arg_b=None):
         validation.validate_text(arg_a, required=False)
         validation.validate_text(arg_b, required=False)
@@ -76,7 +86,8 @@ Creating new validators.
 Packaging new validators into a library.
 
 
-### Tips
+Tips
+~~~~
 
 Avoid writing wrappers that hide details your code depends on.
 
@@ -85,21 +96,23 @@ Catch validation errors at the top level.
 Alternate validation and assignment to make it clear when validation is missing
 
 
-## Installation
+Installation
+------------
 
-Recommended method is to use the version from [pypi](https://pypi.python.org/pypi/validation):
+Recommended method is to use the version from `pypi`_:
 
-```
-pip install validation
-```
+.. code:: bash
+
+    $ pip install validation
 
 Please note that this library only supports python version 2.7, and versions 3.4 and later.
 
 
-## Versioning
+Versioning
+----------
 
-This library strictly follows the [semantic versioning scheme](http://semver.org/).
-Due to its limited scope we can be fairly explicit about what changes can be expected in a release.
+This library strictly follows the `semantic versioning scheme <http://semver.org>`_.
+Due to the libraries limited scope we can be fairly explicit about what changes can be expected in a release.
 
 Changes that will require a major version bump:
   - Removing validation functions.
@@ -128,7 +141,8 @@ Applications should do likewise but are encouraged to pin a particular version
 for releases.
 
 
-## Design
+Design
+------
 
 Validators are intended as an easy way to start rolling out type-checking in an existing codebase.
 
@@ -142,65 +156,85 @@ Error messages are developer focused, and will usually indicate developer mistak
 They are not intended for directly handling user input.
 
 Requirements:
-  - Exceptions raised by validators should make sense when they are propagated
-    by the calling function.
-  - Exceptions should contain enough information to immediately identify
-    exactly what is wrong with a value if the value can be seen.
-  - Exceptions should contain enough information to make a good guess at what
-    is wrong with a value if the value is no longer available.
+
+- Exceptions raised by validators should make sense when they are propagated
+  by the calling function.
+
+- Exceptions should contain enough information to immediately identify
+  exactly what is wrong with a value if the value can be seen.
+
+- Exceptions should contain enough information to make a good guess at what
+  is wrong with a value if the value is no longer available.
+
 
 Non-requirements:
-  - Exceptions do not need to contain any information that would allow the
-    program to distinguish between errors.
-  - Validators should not expect to be run on serialized data.
+
+- Exceptions do not need to contain any information that would allow the
+  program to distinguish between errors.
+
+- Validators should not expect to be run on serialized data.
+
 
 Accordingly we have made some decisions.
 
 
-### Validators only raise built in exceptions.
+Validators only raise built in exceptions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Validators can raise one of only two exception types.
 They can raise a `TypeError` indicating that the function was passed a completely invalid value, or they can raise a `ValueError` indicating that the function was passed a value fell foul of one of the additional constraints.
 
 More exception types will not be introduced.  It is not expected that callers will attempt to catch exceptions raised by this library.
 
+- The validation library should be an implementation detail of the calling
+  library.
+  Having custom exceptions from the validation library be propagated by
+  libraries that depend on it is an abstraction leak.
 
-  - The validation library should be an implementation detail of the calling
-    library.
-    Having custom exceptions from the validation library be propagated by
-    libraries that depend on it is an abstraction leak.
+- There is no need to be able to distinguish, programmatically, to any great
+  level of accuracy between different types of errors.
+  If the ability to recover from specific errors is desired then those errors
+  should be checked for explicitly.
 
-  - There is no need to be able to distinguish, programmatically, to any great
-    level of accuracy between different types of errors.
-    If the ability to recover from specific errors is desired then those errors
-    should be checked for explicitly.
+- Using only built-in exceptions makes it easier for users to implement their
+  own validators.
+  There is no pressure to add a new class for every error condition, and no
+  need to fit custom exceptions into the validation library exception
+  hierarchy.
 
-  - Using only built-in exceptions makes it easier for users to implement their
-    own validators.
-    There is no pressure to add a new class for every error condition, and no
-    need to fit custom exceptions into the validation library exception
-    hierarchy.
-
-  - Limiting ourselves to built-in exceptions with simple message allows us to
-    re-raise the exceptions with more context when validating datastructures.
-
-
-### Exceptions raised by validators will contain only a message.
+- Limiting ourselves to built-in exceptions with simple message allows us to
+  re-raise the exceptions with more context when validating datastructures.
 
 
-### Validators do not return a value.
+Exceptions raised by validators will contain only a message
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Validators do not return a value
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if a value is not in the expected form going in then it is an error.
 This keeps the API simple, and reduces the temptation
 
 
-### Validators will never modify the values that they are passed.
+Validators will never modify the values that they are passed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is for the same reason that validators do not return values, but in this case the justification is stronger.
 This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.
 
 
-### Validators prioritise performance over comprehensiveness.
+Validators prioritise performance over comprehensiveness
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 They should never be worse than linear, in time or space, in the size of their input.
 More complex validation should not be performed unless requested specifically.
 This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
+
+
+
+Validator closures should not be usefully introspectable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This makes is much easier for custom functions to be used in place of
+validators from this library.
+
 
 
 
@@ -216,7 +250,6 @@ It should be easy to add new validators
 validators are just a closure.
 
 
-Validator closures should not be usefully introspectable.
 
 
 All validators should be exposed in a flat namespace.
@@ -234,15 +267,17 @@ Users should be prepared to write python for more complex use cases.
 
 
 
-## Guidelines
+Guidelines
+----------
 
-  - All validators should have complete type annotations.
-  - `min_value` and `max_value`
-  - `min_length` and `max_length`
-  - Exception messages should contain the `repr` of the value that failed.
-  - Validators should not call other validators
+- All validators should have complete type annotations.
+- `min_value` and `max_value`
+- `min_length` and `max_length`
+- Exception messages should contain the `repr` of the value that failed.
+- Validators should not call other validators
 
-## Links
+Links
+-----
 
 - Source code: https://github.com/JOIVY/validation
 - Issue tracker: https://github.com/JOIVY/validation/issues
@@ -250,6 +285,18 @@ Users should be prepared to write python for more complex use cases.
 - PyPI: https://pypi.python.org/pypi/validation
 
 
-## License
+License
+-------
 
-The project is made available under the terms of the Apache 2.0 license.  See [LICENSE](./LICENSE) for details.
+The project is made available under the terms of the Apache 2.0 license.  See `LICENSE`_ for details.
+
+
+
+.. |build-status| image:: https://travis-ci.org/JOIVY/validation/g.png?branch=develop
+    :target: https://travis-ci.org/JOIVY/validation/g
+    :alt: Build Status
+.. |coverage| image:: https://coveralls.io/repos/JOIVY/validation/g/badge.png?branch=develop
+    :target: https://coveralls.io/r/JOIVY/validation/g?branch=develop
+    :alt: Coverage
+.. _pypi: https://pypi.python.org/pypi/validation
+.. _LICENSE: ./LICENSE
