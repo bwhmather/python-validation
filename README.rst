@@ -181,29 +181,30 @@ Accordingly we have made some decisions.
 Validators only raise built in exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Validators can raise one of only two exception types.
-They can raise a `TypeError` indicating that the function was passed a completely invalid value, or they can raise a `ValueError` indicating that the function was passed a value fell foul of one of the additional constraints.
+This library does not introduce any custom exception types.
+It instead limits itself to the exception types defined in the standard
+library.
+This in practice means `TypeError`, `ValueError` or, on rare occasions,
+`KeyError`.
 
-More exception types will not be introduced.  It is not expected that callers will attempt to catch exceptions raised by this library.
 
-- The validation library should be an implementation detail of the calling
-  library.
-  Having custom exceptions from the validation library be propagated by
-  libraries that depend on it is an abstraction leak.
+There are two main reasons for this:
 
-- There is no need to be able to distinguish, programmatically, to any great
-  level of accuracy between different types of errors.
-  If the ability to recover from specific errors is desired then those errors
-  should be checked for explicitly.
+- Using built-in errors means that other libraries can use this package to
+  validate arguments passed to their public API without catching, wrapping and
+  re-raising the exceptions it raises, or leaking implementation details.
 
-- Using only built-in exceptions makes it easier for users to implement their
-  own validators.
+- Using built-in errors makes it much easier to mix custom validation with
+  validation using the validation functions.
   There is no pressure to add a new class for every error condition, and no
   need to fit custom exceptions into the validation library exception
   hierarchy.
 
-- Limiting ourselves to built-in exceptions with simple message allows us to
-  re-raise the exceptions with more context when validating datastructures.
+The main reason to consider introducing custom exceptions is that it would
+allow calling code to behave differently depending on what issues were
+detected.
+For the intended application of this library, to serve as a runtime
+type-checker for function arguments, I don't think that this would be useful.
 
 
 Exceptions raised by validators will contain only a message
