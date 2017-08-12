@@ -53,6 +53,7 @@ to each of the values they contain.
 This can be expressed more succinctly as:
 
 .. code:: python
+
     >>> value = [1, -2]
     >>> validate_list(value, validator=validate_int(min_value=0))
     Traceback (most recent call last):
