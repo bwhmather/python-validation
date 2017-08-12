@@ -8,98 +8,81 @@ A python library for runtime type checking and validation of python values.
 Intended as a stepping stone to static typing.
 
 
-## Design
-
-Validators are intended as an easy way to start rolling out type-checking in an existing codebase.
-Error messages are developer focused, and will usually indicate developer mistakes.
-They are not intended for directly handling user input.
-
-Accordingly we have made some decisions.
-
-Validators can raise one of only two exception types.
-They can raise a `TypeError` indicating that the function was passed a completely invalid value, or they can raise a `ValueError` indicating that the function was passed a value fell foul of one of the additional constraints.
-
-More exception types will not be introduced.  It is not expected that callers will attempt to catch exceptions raised by this library.
-
-
-Validators cannot return a value.
-if a value is not in the expected form going in then it is an error.
-This keeps the API simple, and reduces the temptation
-
-
-Validators will not modify the values they are passed.
-This is for the same reason that validators do not return values, but in this case the justification is stronger.
-This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.
-
-
-Validators should prioritise performance over comprehensiveness.
-They should never be worse than linear, in time or space, in the size of their input.
-More complex validation should not be performed unless requested specifically.
-This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
-
-
-
-Usability
-
-Checks should pass or fail predictably.
-Given the same input, a validator should always behave in the same way.
-Given similar input, a validator should also behave similarly.
-It would be unacceptable, for example, for the list validator to validate only the first ten elements.
-
-
-It should be easy to add new validators
-validators are just a closure.
-
-
-Validator closures should not be usefully introspectable.
-
-
-All validators should be exposed in a flat namespace.
-
-
-Validators for datatypes from other libraries should not look out of place.
-This is very much a TODO.
-Need a convention for naming extension libraries.
-Should consider namespace modules and setuptools hooks, but only as a last resort.
-
-
-Validators do not attempt to cover every possible check.
-They provide a succinct way to express the most obvious checks easily.
-Users should be prepared to write python for more complex use cases.
-
-
-
-## Guidelines
-
-  - All validators should have complete type annotations.
-  - `min_value` and `max_value`
-  - `min_length` and `max_length`
-  - Exception messages should contain the `repr` of the value that failed.
-  - Validators should not call other validators
-
-
 ## Usage
 
-Using the simple validators.
+All validators are functions which take a single value to check as their
+first argument, check its type and that it meets some preconditions, and raises
+an exception if it finds something wrong.
 
-Mixing with manual checks.  Mutually exclusive arguments.
+    >>> validation.validate_int(1)
+    >>> validation.validate_int(1.5)
+    Traceback (most recent call last):
+        ...
+    TypeError: expected 'int', but value is of type 'float'
+    >>> validation.validate_int(-1, min_value=0)
+    Traceback (most recent call last):
+        ...
+    ValueError: expected value greater than 0, but got -1
 
-Validating iterables.  `list` then `validate_list`.
+If the first argument is missing, validators will return a closure that can be
+called later to check a value.
 
-Using the datastructure validators with simple validators.
+    >>> validator = validation.validate_int(min_value=0)
+    >>> validator(-1)
+    Traceback (most recent call last):
+        ...
+    ValueError: expected value greater than 0, but got -1
+
+This is important when using the datastructure validators.
+Datastructure validators usually accept as an argument a function to be applied
+to each of the values they contain.
+
+    >>> value = [1, -2]
+    >>> validate_list(value, validator=lambda v: validate_int(v, min_value=0))
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid item at position 1: expected value greater than 0 but got -1
+
+This can be expressed more succinctly as:
+
+    >>> value = [1, -2]
+    >>> validate_list(value, validator=validate_int(min_value=0))
+    Traceback (most recent call last):
+        ...
+    ValueError: invalid item at position 1: expected value greater than 0 but got -1
+
 
 Using the datastructure validators with closures.
+
+Validating iterables.  `list` then `validate_list`, or validate in loop.
+
+This library provides a shorthand for performing simple checks on single
+variables.
+It does not prevent you from writing more checks in normal python!
+As an example, to validate two mutually exclusive arguments:
+
+    def do_something(arg_a=None, arg_b=None):
+        validation.validate_text(arg_a, required=False)
+        validation.validate_text(arg_b, required=False)
+
+        if arg_a is None == arg_b is None:
+            raise TypeError('arg_a and arg_b are mutually exclusive')
+
+        ...
+
 
 Creating new validators.
 
 Packaging new validators into a library.
 
 
-## Tips for Usage
+### Tips
 
 Avoid writing wrappers that hide details your code depends on.
 
 Catch validation errors at the top level.
+
+Alternate validation and assignment to make it clear when validation is missing
 
 
 ## Installation
@@ -144,6 +127,120 @@ Libraries should specify a minimum minor version and maximum major version.
 Applications should do likewise but are encouraged to pin a particular version
 for releases.
 
+
+## Design
+
+Validators are intended as an easy way to start rolling out type-checking in an existing codebase.
+
+It is expected that if validation of a value fails, the error will propagate thought.
+A script encountering a validation error should exit with a stack-trace, an http server should return a 500 error
+
+
+To recover from specific errors reimplement the check explicitly in python.
+
+Error messages are developer focused, and will usually indicate developer mistakes.
+They are not intended for directly handling user input.
+
+Requirements:
+  - Exceptions raised by validators should make sense when they are propagated
+    by the calling function.
+  - Exceptions should contain enough information to immediately identify
+    exactly what is wrong with a value if the value can be seen.
+  - Exceptions should contain enough information to make a good guess at what
+    is wrong with a value if the value is no longer available.
+
+Non-requirements:
+  - Exceptions do not need to contain any information that would allow the
+    program to distinguish between errors.
+  - Validators should not expect to be run on serialized data.
+
+Accordingly we have made some decisions.
+
+
+### Validators only raise built in exceptions.
+Validators can raise one of only two exception types.
+They can raise a `TypeError` indicating that the function was passed a completely invalid value, or they can raise a `ValueError` indicating that the function was passed a value fell foul of one of the additional constraints.
+
+More exception types will not be introduced.  It is not expected that callers will attempt to catch exceptions raised by this library.
+
+
+  - The validation library should be an implementation detail of the calling
+    library.
+    Having custom exceptions from the validation library be propagated by
+    libraries that depend on it is an abstraction leak.
+
+  - There is no need to be able to distinguish, programmatically, to any great
+    level of accuracy between different types of errors.
+    If the ability to recover from specific errors is desired then those errors
+    should be checked for explicitly.
+
+  - Using only built-in exceptions makes it easier for users to implement their
+    own validators.
+    There is no pressure to add a new class for every error condition, and no
+    need to fit custom exceptions into the validation library exception
+    hierarchy.
+
+  - Limiting ourselves to built-in exceptions with simple message allows us to
+    re-raise the exceptions with more context when validating datastructures.
+
+
+### Exceptions raised by validators will contain only a message.
+
+
+### Validators do not return a value.
+if a value is not in the expected form going in then it is an error.
+This keeps the API simple, and reduces the temptation
+
+
+### Validators will never modify the values that they are passed.
+This is for the same reason that validators do not return values, but in this case the justification is stronger.
+This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.
+
+
+### Validators prioritise performance over comprehensiveness.
+They should never be worse than linear, in time or space, in the size of their input.
+More complex validation should not be performed unless requested specifically.
+This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
+
+
+
+Usability
+
+Checks should pass or fail predictably.
+Given the same input, a validator should always behave in the same way.
+Given similar input, a validator should also behave similarly.
+It would be unacceptable, for example, for the list validator to validate only the first ten elements.
+
+
+It should be easy to add new validators
+validators are just a closure.
+
+
+Validator closures should not be usefully introspectable.
+
+
+All validators should be exposed in a flat namespace.
+
+
+Validators for datatypes from other libraries should not look out of place.
+This is very much a TODO.
+Need a convention for naming extension libraries.
+Should consider namespace modules and setuptools hooks, but only as a last resort.
+
+
+Validators do not attempt to cover every possible check.
+They provide a succinct way to express the most obvious checks easily.
+Users should be prepared to write python for more complex use cases.
+
+
+
+## Guidelines
+
+  - All validators should have complete type annotations.
+  - `min_value` and `max_value`
+  - `min_length` and `max_length`
+  - Exception messages should contain the `repr` of the value that failed.
+  - Validators should not call other validators
 
 ## Links
 
