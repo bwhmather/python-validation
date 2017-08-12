@@ -286,7 +286,7 @@ def _validate_structure(
     if schema is not None:
         for key, validator in schema.items():
             if key not in value:
-                raise ValueError((
+                raise KeyError((
                     "dictionary missing expected key: {key!r}"
                 ).format(key=key, dictionary=value))
 
