@@ -210,6 +210,23 @@ type-checker for function arguments, I don't think that this would be useful.
 Exceptions raised by validators will contain only a message
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The reasons here are similar to the reasons for using built-in exceptions:
+
+- It's much easier to keep simple messages consistent.
+  This is particularly important as we want to encourage mixing with custom
+  validation code.
+
+- It is expected that the exceptions will be interpreted by a developer, not by
+  by the calling logic.
+  There is no requirement for machine readable information.
+
+- This restriction, along with the restriction on exception types, makes it
+  easy to add context information to exceptions thrown from within the data-
+  structure validation functions.
+
+There is also the simple reason that the standard library documentation demands
+it.
+
 
 Validators do not return a value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
