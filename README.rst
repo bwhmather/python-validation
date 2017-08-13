@@ -5,11 +5,43 @@ Python Validation
 
 A python library for runtime type checking and validation of python values.
 
-Intended as a stepping stone to static typing.
+Intended as a stepping stone towards static typing.
 
 
 Usage
 -----
+
+First, a toy example demonstrating typical usage.
+
+.. code:: python
+
+    from validation import (
+        validate_int, validate_float,
+        validate_structure,
+        validate_text,
+    )
+
+    def function(int_arg, dict_arg, unicode_arg=None):
+        """
+        A normal function that expects to be called in a particular way.
+
+        :param int int_arg:
+            A non-optional integer.  Must be between one and ten.
+        :param dict dict_arg:
+            A dictionary containing an integer id, and a floating point amount.
+        :param str unicode_arg:
+            An optional string.
+        """
+        validate_int(int_arg, min_value=0, max_value=10)
+        validate_structure(dict_arg, schema={
+            'id': validate_int(min_value=0)
+            'amount': validate_float(),
+        })
+        validate_text(unicode_argument, required=False)
+
+        # Do something.
+        ...
+
 
 All validators are functions which take a single value to check as their
 first argument, check its type and that it meets some preconditions, and raises
@@ -147,7 +179,8 @@ Design
 
 Validators are intended as an easy way to start rolling out type-checking in an existing codebase.
 
-It is expected that if validation of a value fails, the error will propagate thought.
+It is expected that if validation of a value fails, the error will propagate
+through.
 A script encountering a validation error should exit with a stack-trace, an http server should return a 500 error
 
 
@@ -174,6 +207,37 @@ Non-requirements:
   program to distinguish between errors.
 
 - Validators should not expect to be run on serialized data.
+
+
+
+
+Checks should pass or fail predictably.
+Given the same input, a validator should always behave in the same way.
+Given similar input, a validator should also behave similarly.
+It would be unacceptable, for example, for the list validator to validate only the first ten elements.
+
+
+It should be easy to add new validators
+validators are just a closure.
+
+
+
+Validators for datatypes from other libraries should not look out of place.
+Need a convention for naming extension libraries.
+Should consider namespace modules and setuptools hooks, but only as a last resort.
+
+Validators do not attempt to cover every possible check.
+They provide a succinct way to express the most obvious checks easily.
+Users should be prepared to write python for more complex use cases.
+
+Validators prioritise performance over comprehensiveness
+They should never be worse than linear, in time or space, in the size of their input.
+More complex validation should not be performed unless requested specifically.
+This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
+
+
+All validators should be exposed in a flat namespace.
+
 
 
 Accordingly we have made some decisions.
@@ -222,8 +286,8 @@ The reasons here are similar to the reasons for using built-in exceptions:
   There is no requirement for machine readable information.
 
 - This restriction, along with the restriction on exception types, makes it
-  easy to add context information to exceptions thrown from within the data-
-  structure validation functions.
+  easy to add context information to exceptions thrown from within the
+  data-structure validation functions.
 
 There is also the simple reason that the standard library documentation demands
 it.
@@ -231,59 +295,17 @@ it.
 
 Validators do not return a value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if a value is not in the expected form going in then it is an error.
-This keeps the API simple, and reduces the temptation
+
+If a value is not in the expected form going in then it is an error.
+
+Callers are likely to forget to use the fixed return value rather than the
+invalid original.
 
 
 Validators will never modify the values that they are passed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This is for the same reason that validators do not return values, but in this case the justification is stronger.
 This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.
-
-
-Validators prioritise performance over comprehensiveness
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-They should never be worse than linear, in time or space, in the size of their input.
-More complex validation should not be performed unless requested specifically.
-This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
-
-
-
-Validator closures should not be usefully introspectable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This makes is much easier for custom functions to be used in place of
-validators from this library.
-
-
-
-
-Usability
-
-Checks should pass or fail predictably.
-Given the same input, a validator should always behave in the same way.
-Given similar input, a validator should also behave similarly.
-It would be unacceptable, for example, for the list validator to validate only the first ten elements.
-
-
-It should be easy to add new validators
-validators are just a closure.
-
-
-
-
-All validators should be exposed in a flat namespace.
-
-
-Validators for datatypes from other libraries should not look out of place.
-This is very much a TODO.
-Need a convention for naming extension libraries.
-Should consider namespace modules and setuptools hooks, but only as a last resort.
-
-
-Validators do not attempt to cover every possible check.
-They provide a succinct way to express the most obvious checks easily.
-Users should be prepared to write python for more complex use cases.
-
 
 
 Guidelines
