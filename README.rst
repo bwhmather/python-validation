@@ -107,7 +107,7 @@ expressed more succinctly as:
 Patterns
 ~~~~~~~~
 
-Validating iterables.  `list` then `validate_list`, or validate in loop.
+Validating iterables.  ``list`` then ``validate_list``, or validate in loop.
 
 This library provides a shorthand for performing simple checks on single
 variables.
@@ -261,8 +261,8 @@ Validators only raise built in exceptions
 This library does not introduce any custom exception types.
 It instead limits itself to the exception types defined in the standard
 library.
-This in practice means `TypeError`, `ValueError` or, on rare occasions,
-`KeyError`.
+This in practice means ``TypeError``, ``ValueError`` or, on rare occasions,
+``KeyError``.
 
 
 There are two main reasons for this:
@@ -324,9 +324,9 @@ Guidelines
 ----------
 
 - All validators should have complete type annotations.
-- `min_value` and `max_value`
-- `min_length` and `max_length`
-- Exception messages should contain the `repr` of the value that failed.
+- ``min_value`` and ``max_value``
+- ``min_length`` and ``max_length``
+- Exception messages should contain the ``repr`` of the value that failed.
 - Validators should not call other validators
 
 Links
