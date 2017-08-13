@@ -11,7 +11,7 @@ Intended as a stepping stone towards static typing.
 Usage
 -----
 
-First, a toy example demonstrating typical usage.
+A toy example demonstrating typical usage:
 
 .. code:: python
 
@@ -20,6 +20,7 @@ First, a toy example demonstrating typical usage.
         validate_structure,
         validate_text,
     )
+
 
     def function(int_arg, dict_arg, unicode_arg=None):
         """
@@ -32,6 +33,7 @@ First, a toy example demonstrating typical usage.
         :param str unicode_arg:
             An optional string.
         """
+        # Validate arguments.
         validate_int(int_arg, min_value=0, max_value=10)
         validate_structure(dict_arg, schema={
             'id': validate_int(min_value=0)
@@ -42,10 +44,18 @@ First, a toy example demonstrating typical usage.
         # Do something.
         ...
 
+The validation functions are used to check arguments passed to a public
+function.
+Exceptions raised by the validation functions are allowed to propagate through.
+No logic is run until validation is complete.
+
+
+Basics
+~~~~~~
 
 All validators are functions which take a single value to check as their
-first argument, check its type and that it meets some preconditions, and raises
-an exception if it finds something wrong.
+first argument, check its type and that it meets some preconditions, and raise
+an exception if they find something wrong.
 
 .. code:: python
 
@@ -59,8 +69,8 @@ an exception if it finds something wrong.
         ...
     ValueError: expected value greater than 0, but got -1
 
-If the first argument is missing, validators will return a closure that can be
-called later to check a value.
+If the first argument is missing, validator functions will return a closure
+that can be called later to check a value.
 
 .. code:: python
 
@@ -71,8 +81,8 @@ called later to check a value.
     ValueError: expected value greater than 0, but got -1
 
 This is important when using the datastructure validators.
-Datastructure validators usually accept as an argument a function to be applied
-to each of the values they contain.
+Datastructure validation functions usually accept as an argument a function to
+be applied to each of the values they contain.
 
 .. code:: python
 
@@ -82,7 +92,8 @@ to each of the values they contain.
         ...
     ValueError: invalid item at position 1: expected value greater than 0 but got -1
 
-This can be expressed more succinctly as:
+Having validation functions return a validator closure means that this can be
+expressed more succinctly as:
 
 .. code:: python
 
@@ -93,7 +104,8 @@ This can be expressed more succinctly as:
     ValueError: invalid item at position 1: expected value greater than 0 but got -1
 
 
-Using the datastructure validators with closures.
+Patterns
+~~~~~~~~
 
 Validating iterables.  `list` then `validate_list`, or validate in loop.
 
