@@ -35,7 +35,13 @@ def validate_int(
     required=True,
 ):
     """
-    Validator for integer values.
+    Checks that the target value is a valid integer, and that it fits in the
+    requested bounds.
+
+    Does not accept integer values encoded as ``floats``.
+    Adding a value to a ``float`` will result in a loss of precision if the
+    total is greater than ``2**53``.
+    The division operator also behaves differently in python 3.
 
     :param int value:
         The number to be validated.
@@ -84,7 +90,7 @@ def _validate_bool(value, required=True):
 
 def validate_bool(value=_undefined, required=True):
     """
-    Validator for boolean values.
+    Checks that the target value is a valid boolean.
 
     :param value:
         The value to be validated.
@@ -151,7 +157,24 @@ def validate_text(
     required=True,
 ):
     """
-    Validator for human readable string values.
+    Checks that the target value is a valid human readable string value.
+
+    In python 2 this will strictly enforce the use of ``unicode``.
+    ``str``s are not accepted as there is no way to tell if they are the
+    result of decoding a byte-string containing only ``latin-1`` characters
+    or if they are still encoded.  In python 3 things are much simpler.
+
+    Patterns are python regular expressions and must match the entire string.
+
+    A simple example that uses the pattern parameter to validate a string
+    describing a date:
+    .. code:: python
+
+        def parse_date(string):
+            validate_text(string, pattern='[0-9]{4}-[0-9]{2}-[0-9]{2}')
+
+            # Do something
+            ...
 
     :param unicode value:
         The string to be validated.
@@ -226,7 +249,9 @@ def validate_bytes(
     required=True,
 ):
     """
-    Validator for bytestring values.
+    Checks that the supplied value is a valid byte-string.
+
+    In python 3 will accepts `bytes`, in python 2 `str`.
 
     Should not be used for validating human readable strings,  Please use
     :func:`validate_text` instead.
@@ -315,6 +340,9 @@ def _validate_datetime(value, required=True):
 def validate_datetime(value=_undefined, required=True):
     """
     Checks that the value is a valid :class:`datetime.datetime` value.
+
+    The value must have a valid timezone to be accepted.  Naive `datetime`
+    objects are not allowed.
 
     :param datetime.date value:
         The value to be validated.
