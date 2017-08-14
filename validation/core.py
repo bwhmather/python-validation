@@ -51,6 +51,12 @@ def validate_int(
         The maximum acceptable value for the number.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not an integer, or if it was marked as `required` but
+        `None` was passed in.
+    :raises ValueError:
+        If the value is not within bounds.
     """
     _validate_int(min_value, required=False)
     _validate_int(max_value, min_value=min_value, required=False)
@@ -96,6 +102,10 @@ def validate_bool(value=_undefined, required=True):
         The value to be validated.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not a boolean, or if it was marked as `required` but
+        `None` was passed in.
     """
     _validate_bool(required)
 
@@ -168,6 +178,7 @@ def validate_text(
 
     A simple example that uses the pattern parameter to validate a string
     describing a date:
+
     .. code:: python
 
         def parse_date(string):
@@ -187,6 +198,13 @@ def validate_text(
         Regular expression to check the value against.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not a unicode string , or if it was marked as
+        `required` but `None` was passed in.
+    :raises ValueError:
+        If the value was longer or shorter than expected, or did not match
+        the pattern.
     """
     _validate_int(max_length, min_value=0, required=False)
     # The max_value check here is fine.  If max_length is None then there is no
@@ -265,6 +283,12 @@ def validate_bytes(
         is not checked.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not a byte-string, or if it was marked as `required`
+        but `None` was passed in.
+    :raises ValueError:
+        If the value was longer or shorter than expected.
     """
     _validate_int(max_length, min_value=0, required=False)
     # The max_value check here is fine.  If max_length is None then there is no
@@ -310,6 +334,10 @@ def validate_date(value=_undefined, required=True):
         The value to be validated.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not a date, or if it was marked as `required` but
+        None was passed in.
     """
     def validate(value):
         _validate_date(value, required=required)
@@ -348,6 +376,12 @@ def validate_datetime(value=_undefined, required=True):
         The value to be validated.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
+
+    :raises TypeError:
+        If the value is not a datetime, or if it was marked as `required` but
+        None was passed in.
+    :raises ValueError:
+        If the value does not have a valid timezone.
     """
     def validate(value):
         _validate_datetime(value, required=required)
