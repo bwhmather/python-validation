@@ -1,18 +1,31 @@
-Python Validation
-=================
+==========
+Validation
+==========
 
+A python library for runtime type checking and validation of python values.
 
+Contents
+========
 
 .. toctree::
-  :caption: Contents:
+  :maxdepth: 1
+
+  installation
+
+.. toctree::
   :maxdepth: 2
 
-  core
-  datastructures
+  tutorial
 
+.. toctree::
+  :maxdepth: 1
 
-.. include:: ../README.rst
-  :start-after: begin-docs
+  design
+
+.. toctree::
+  :maxdepth: 3
+
+  reference
 
 
 Indices and tables
