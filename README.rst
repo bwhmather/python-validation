@@ -193,70 +193,6 @@ Design
 
 Validators are intended as an easy way to start rolling out type-checking in an existing codebase.
 
-It is expected that if validation of a value fails, the error will propagate
-through.
-A script encountering a validation error should exit with a stack-trace, an http server should return a 500 error
-
-
-To recover from specific errors reimplement the check explicitly in python.
-
-Error messages are developer focused, and will usually indicate developer mistakes.
-They are not intended for directly handling user input.
-
-Requirements:
-
-- Exceptions raised by validators should make sense when they are propagated
-  by the calling function.
-
-- Exceptions should contain enough information to immediately identify
-  exactly what is wrong with a value if the value can be seen.
-
-- Exceptions should contain enough information to make a good guess at what
-  is wrong with a value if the value is no longer available.
-
-
-Non-requirements:
-
-- Exceptions do not need to contain any information that would allow the
-  program to distinguish between errors.
-
-- Validators should not expect to be run on serialized data.
-
-
-
-
-Checks should pass or fail predictably.
-Given the same input, a validator should always behave in the same way.
-Given similar input, a validator should also behave similarly.
-It would be unacceptable, for example, for the list validator to validate only the first ten elements.
-
-
-It should be easy to add new validators
-validators are just a closure.
-
-
-
-Validators for datatypes from other libraries should not look out of place.
-Need a convention for naming extension libraries.
-Should consider namespace modules and setuptools hooks, but only as a last resort.
-
-Validators do not attempt to cover every possible check.
-They provide a succinct way to express the most obvious checks easily.
-Users should be prepared to write python for more complex use cases.
-
-Validators prioritise performance over comprehensiveness
-They should never be worse than linear, in time or space, in the size of their input.
-More complex validation should not be performed unless requested specifically.
-This again comes down to the intended use of the library as a stand-in for a compile time type-checker.
-
-
-All validators should be exposed in a flat namespace.
-
-
-
-Accordingly we have made some decisions.
-
-
 Validators only raise built in exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -321,15 +257,6 @@ Validators will never modify the values that they are passed
 This is for the same reason that validators do not return values, but in this case the justification is stronger.
 This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.
 
-
-Guidelines
-----------
-
-- All validators should have complete type annotations.
-- ``min_value`` and ``max_value``
-- ``min_length`` and ``max_length``
-- Exception messages should contain the ``repr`` of the value that failed.
-- Validators should not call other validators
 
 Links
 -----
