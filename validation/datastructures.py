@@ -84,7 +84,7 @@ def validate_list(
     required=True,
 ):
     """
-    Validator to check a list and all of its contents.
+    Checks that the supplied value is a valid list.
 
     :param list value:
         The array to be validated.
