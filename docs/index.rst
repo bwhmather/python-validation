@@ -1,15 +1,18 @@
-.. Validation documentation master file, created by
-   sphinx-quickstart on Sun Aug 13 13:23:29 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Python Validation
+=================
 
-Welcome to Validation's documentation!
-======================================
+
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+  :caption: Contents:
+  :maxdepth: 2
 
+  core
+  datastructures
+
+
+.. include:: ../README.rst
+  :start-after: begin-docs
 
 
 Indices and tables
@@ -18,3 +21,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+

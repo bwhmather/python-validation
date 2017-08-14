@@ -324,6 +324,8 @@ def validate_structure(
 
     A simple example:
 
+    .. code:: python
+
         validator = validate_structure(schema={
             'id': validate_key(kind='Model'),
             'count': validate_int(min=0),

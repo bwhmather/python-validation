@@ -3,6 +3,8 @@ Python Validation
 
 |build-status| |coverage|
 
+.. begin-docs
+
 A python library for runtime type checking and validation of python values.
 
 Intended as a stepping stone towards static typing.

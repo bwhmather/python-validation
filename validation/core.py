@@ -89,7 +89,7 @@ def validate_bool(value=_undefined, required=True):
     :param value:
         The value to be validated.
     :param bool required:
-        Whether the value can be `None`.  Defaults to True.
+        Whether the value can be `None`.  Defaults to `True`.
     """
     _validate_bool(required)
 
@@ -163,7 +163,7 @@ def validate_text(
     :param str|re.SRE_Pattern pattern:
         Regular expression to check the value against.
     :param bool required:
-        Whether the value can be `None`.  Defaults to True.
+        Whether the value can be `None`.  Defaults to `True`.
     """
     _validate_int(max_length, min_value=0, required=False)
     # The max_value check here is fine.  If max_length is None then there is no
@@ -229,7 +229,7 @@ def validate_bytes(
     Validator for bytestring values.
 
     Should not be used for validating human readable strings,  Please use
-    :function:`validate_string` instead.
+    :func:`validate_text` instead.
 
     :param bytes value:
         The string to be validated.
@@ -239,7 +239,7 @@ def validate_bytes(
         The maximum acceptable length for the string.  By default, the length
         is not checked.
     :param bool required:
-        Whether the value can be `None`.  Defaults to True.
+        Whether the value can be `None`.  Defaults to `True`.
     """
     _validate_int(max_length, min_value=0, required=False)
     # The max_value check here is fine.  If max_length is None then there is no
@@ -284,7 +284,7 @@ def validate_date(value=_undefined, required=True):
     :param datetime.date value:
         The value to be validated.
     :param bool required:
-        Whether the value can be `None`.  Defaults to True.
+        Whether the value can be `None`.  Defaults to `True`.
     """
     def validate(value):
         _validate_date(value, required=required)
@@ -319,7 +319,7 @@ def validate_datetime(value=_undefined, required=True):
     :param datetime.date value:
         The value to be validated.
     :param bool required:
-        Whether the value can be `None`.  Defaults to True.
+        Whether the value can be `None`.  Defaults to `True`.
     """
     def validate(value):
         _validate_datetime(value, required=required)
