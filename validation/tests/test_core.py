@@ -186,6 +186,13 @@ class ValidateBytesTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(b"123")
 
+    def test_repr(self):
+        validator = validate_bytes(min_length=4, max_length=10, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_bytes(min_length=4, max_length=10, required=False)',
+        )
+
 
 class ValidateDateTestCase(unittest.TestCase):
     def test_valid(self):
