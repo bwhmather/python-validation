@@ -505,6 +505,24 @@ def _validate_datetime(value, required=True):
         ))
 
 
+class _datetime_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_datetime(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_datetime({args})'.format(args=', '.join(args))
+
+
 def validate_datetime(value=_undefined, required=True):
     """
     Checks that the value is a valid :class:`datetime.datetime` value.
@@ -523,8 +541,7 @@ def validate_datetime(value=_undefined, required=True):
     :raises ValueError:
         If the value does not have a valid timezone.
     """
-    def validate(value):
-        _validate_datetime(value, required=required)
+    validate = _datetime_validator(required=required)
 
     if value is not _undefined:
         validate(value)
