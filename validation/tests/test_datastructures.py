@@ -270,6 +270,13 @@ class ValidateStructureTestCase(unittest.TestCase):
             'unexpected': 2,
         })
 
+    def test_repr(self):
+        validator = validate_structure(schema={'key': validate_int()})
+        self.assertEqual(
+            repr(validator),
+            'validate_structure(schema={\'key\': validate_int()})',
+        )
+
 
 class ValidateTupleTestCase(unittest.TestCase):
     pass
