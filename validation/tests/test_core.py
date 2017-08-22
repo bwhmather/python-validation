@@ -140,6 +140,19 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(u"123")
 
+    def test_repr(self):
+        validator = validate_text(pattern='hello world', required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_text(pattern=\'hello world\', required=False)',
+        )
+
+        validator = validate_text(min_length=4, max_length=10)
+        self.assertEqual(
+            repr(validator),
+            'validate_text(min_length=4, max_length=10)',
+        )
+
 
 class ValidateBytesTestCase(unittest.TestCase):
     def test_valid(self):
