@@ -86,7 +86,7 @@ def validate_int(
     Does not accept integer values encoded as ``floats``.
     Adding a value to a ``float`` will result in a loss of precision if the
     total is greater than ``2**53``.
-    The division operator also behaves differently in python 3.
+    The division operator also behaves differently in python 2.
 
     :param int value:
         The number to be validated.
