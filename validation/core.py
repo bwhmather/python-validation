@@ -449,6 +449,24 @@ def _validate_date(value, required=True):
         ).format(cls=value.__class__.__name__))
 
 
+class _date_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_date(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_date({args})'.format(args=', '.join(args))
+
+
 def validate_date(value=_undefined, required=True):
     """
     Checks that the value is a valid :class:`datetime.date` value.
@@ -462,8 +480,7 @@ def validate_date(value=_undefined, required=True):
         If the value is not a date, or if it was marked as `required` but
         None was passed in.
     """
-    def validate(value):
-        _validate_date(value, required=required)
+    validate = _date_validator(required=required)
 
     if value is not _undefined:
         validate(value)
