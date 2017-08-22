@@ -1,23 +1,51 @@
 language: python
 sudo: false
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
 
-install:
-  - "pip install -e ."
-  - "pip install coveralls"
-  - "pip install pyflakes"
-  - "pip install pycodestyle"
-  - "pip install pylint"
+jobs:
+  include:
+    - stage: coveralls
+      python: 3.6
+      install:
+        - "pip install -e ."
+        - "pip install coveralls"
+      script:
+        - "coverage run --source=validation setup.py test"
+      after_success:
+        - "coveralls"
 
-script:
-  - "coverage run --source=validation setup.py test"
-  - "pycodestyle validation setup.py"
-  - "pyflakes validation setup.py"
-  - "pylint -E validation setup.py"
+    - stage: test
+      python:
+        - "2.7"
+        - "3.4"
+        - "3.5"
+        - "3.6"
+      install:
+        - "pip install -e ."
+      script:
+        - "python setup.py test"
 
-after_success:
-  - "coveralls"
+    - stage: pylint
+      python:
+        - "2.7"
+        - "3.6"
+      install:
+        - "pip install -e ."
+        - "pip install pylint"
+      script:
+        - "pylint -E validation setup.py"
+
+    - stage: pycodestyle
+      python:
+        - "3.6"
+      install:
+        - "pip install pycodestyle"
+      script:
+        - "pycodestyle validation setup.py"
+
+    - stage: pyflakes
+      python:
+        - "3.6"
+      install:
+        - "pip install pyflakes"
+      script:
+        - "pyflakes validation setup.py"
