@@ -2,7 +2,8 @@ import sys
 
 import six
 
-from .core import _validate_int, _validate_bool
+from .core import _validate_bool
+from .number import _validate_int
 
 
 _undefined = object()

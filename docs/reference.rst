@@ -8,13 +8,14 @@ Reference
 Core Validation Functions
 =========================
 
-.. module:: validation.core
 
 Functions for validating simple, immutable, built-in data-types.
 
 
 Numbers
 -------
+
+.. module:: validation.number
 
 .. autofunction:: validate_int
 .. autofunction:: validate_float
@@ -23,6 +24,8 @@ Numbers
 Strings
 -------
 
+.. module:: validation.string
+
 .. autofunction:: validate_text
 .. autofunction:: validate_bytes
 
@@ -30,19 +33,24 @@ Strings
 Time
 ----
 
+.. module:: validation.datetime
+
 .. autofunction:: validate_date
 .. autofunction:: validate_datetime
 
 
 Other
 -----
+
+.. module:: validation.core
+
 .. autofunction:: validate_bool
 
 
 Datastructure Validation Functions
 ==================================
 
-.. module:: validation.datastructures
+.. module:: validation.datastructure
 
 Functions for validating plain data-structures.
 
