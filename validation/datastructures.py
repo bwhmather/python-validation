@@ -310,6 +310,42 @@ def _validate_mapping(
                 raise
 
 
+class _mapping_validator(object):
+    def __init__(self, key_validator, value_validator, required):
+        self.__key_validator = key_validator
+        self.__value_validator = value_validator
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_mapping(
+            value,
+            key_validator=self.__key_validator,
+            value_validator=self.__value_validator,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__key_validator is not None:
+            args.append('key_validator={key_validator!r}'.format(
+                key_validator=self.__key_validator,
+            ))
+
+        if self.__value_validator is not None:
+            args.append('value_validator={value_validator!r}'.format(
+                value_validator=self.__value_validator,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_mapping({args})'.format(args=', '.join(args))
+
+
 def validate_mapping(
     value=_undefined,
     key_validator=None, value_validator=None,
@@ -330,15 +366,11 @@ def validate_mapping(
     :param bool required:
         Whether the value can't be `None`. Defaults to `True`.
     """
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_mapping(
-            value,
-            key_validator=key_validator,
-            value_validator=value_validator,
-            required=required,
-        )
+    validate = _mapping_validator(
+        key_validator=key_validator,
+        value_validator=value_validator,
+        required=required,
+    )
 
     if value is not _undefined:
         validate(value)
