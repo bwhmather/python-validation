@@ -77,6 +77,55 @@ def _validate_list(
                 raise
 
 
+class _list_validator(object):
+    def __init__(self, validator, min_length, max_length, required):
+        self.__validator = validator
+
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_list(
+            value, validator=self.__validator,
+            min_length=self.__min_length, max_length=self.__max_length,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__validator is not None:
+            args.append('validator={validator!r}'.format(
+                validator=self.__validator,
+            ))
+
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_list({args})'.format(args=', '.join(args))
+
+
 def validate_list(
     value=_undefined,
     validator=None,
@@ -99,21 +148,11 @@ def validate_list(
         length is not checked.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
-     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
+    """
+    validate = _list_validator(
+        min_length=min_length, max_length=max_length,
+        validator=validator, required=required,
     )
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_list(
-            value, validator=validator,
-            min_length=min_length, max_length=max_length,
-            required=required,
-        )
 
     if value is not _undefined:
         validate(value)
@@ -153,6 +192,55 @@ def _validate_set(
             validator(item)
 
 
+class _set_validator(object):
+    def __init__(self, validator, min_length, max_length, required):
+        self.__validator = validator
+
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_set(
+            value, validator=self.__validator,
+            min_length=self.__min_length, max_length=self.__max_length,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__validator is not None:
+            args.append('validator={validator!r}'.format(
+                validator=self.__validator,
+            ))
+
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_set({args})'.format(args=', '.join(args))
+
+
 def validate_set(
     value=_undefined,
     validator=None,
@@ -175,21 +263,11 @@ def validate_set(
         maximum size is not checked.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
-     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
+    """
+    validate = _set_validator(
+        min_length=min_length, max_length=max_length,
+        validator=validator, required=required,
     )
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_set(
-            value, validator=validator,
-            min_length=min_length, max_length=max_length,
-            required=required,
-        )
 
     if value is not _undefined:
         validate(value)
@@ -232,6 +310,42 @@ def _validate_mapping(
                 raise
 
 
+class _mapping_validator(object):
+    def __init__(self, key_validator, value_validator, required):
+        self.__key_validator = key_validator
+        self.__value_validator = value_validator
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_mapping(
+            value,
+            key_validator=self.__key_validator,
+            value_validator=self.__value_validator,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__key_validator is not None:
+            args.append('key_validator={key_validator!r}'.format(
+                key_validator=self.__key_validator,
+            ))
+
+        if self.__value_validator is not None:
+            args.append('value_validator={value_validator!r}'.format(
+                value_validator=self.__value_validator,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_mapping({args})'.format(args=', '.join(args))
+
+
 def validate_mapping(
     value=_undefined,
     key_validator=None, value_validator=None,
@@ -252,15 +366,11 @@ def validate_mapping(
     :param bool required:
         Whether the value can't be `None`. Defaults to `True`.
     """
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_mapping(
-            value,
-            key_validator=key_validator,
-            value_validator=value_validator,
-            required=required,
-        )
+    validate = _mapping_validator(
+        key_validator=key_validator,
+        value_validator=value_validator,
+        required=required,
+    )
 
     if value is not _undefined:
         validate(value)
@@ -309,6 +419,49 @@ def _validate_structure(
             ))
 
 
+class _structure_validator(object):
+    def __init__(self, schema, allow_extra, required):
+        _validate_structure(schema, schema=None, required=False)
+        if schema is not None:
+            # Make a copy of the schema to make sure it won't be mutated while
+            # we are using it.
+            schema = dict(schema)
+        self.__schema = schema
+
+        _validate_bool(allow_extra)
+        self.__allow_extra = allow_extra
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_structure(
+            value,
+            schema=self.__schema,
+            allow_extra=self.__allow_extra,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__schema is not None:
+            args.append('schema={schema!r}'.format(
+                schema=self.__schema,
+            ))
+
+        if self.__allow_extra:
+            args.append('allow_extra={allow_extra!r}'.format(
+                required=self.__allow_extra,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_structure({args})'.format(args=', '.join(args))
+
+
 def validate_structure(
     value=_undefined,
     schema=None, allow_extra=False,
@@ -341,20 +494,9 @@ def validate_structure(
     :param bool required:
         Whether the value can't be `None`. Defaults to True.
     """
-    _validate_structure(schema, schema=None, required=False)
-    _validate_bool(allow_extra)
-    _validate_bool(required)
-
-    # Make a copy of the schema to make sure it won't be mutated under us.
-    if schema is not None:
-        schema = dict(schema)
-
-    def validate(value):
-        _validate_structure(
-            value,
-            schema=schema, allow_extra=allow_extra,
-            required=required,
-        )
+    validate = _structure_validator(
+        schema=schema, allow_extra=allow_extra, required=required,
+    )
 
     if value is not _undefined:
         validate(value)

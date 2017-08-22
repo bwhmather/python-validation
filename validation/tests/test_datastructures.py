@@ -53,6 +53,19 @@ class ValidateListTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator([1, 2, 3, 4])
 
+    def test_repr(self):
+        validator = validate_list(min_length=1, max_length=100)
+        self.assertEqual(
+            repr(validator),
+            'validate_list(min_length=1, max_length=100)',
+        )
+
+        validator = validate_list(validator=validate_int(), required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_list(validator=validate_int(), required=False)',
+        )
+
 
 class ValidateSetTestCase(unittest.TestCase):
     def test_empty_is_not_missing(self):
@@ -95,6 +108,19 @@ class ValidateSetTestCase(unittest.TestCase):
         validator({1})
         with self.assertRaises(ValueError):
             validator({1, 2, 3, 4})
+
+    def test_repr(self):
+        validator = validate_set(min_length=1, max_length=100)
+        self.assertEqual(
+            repr(validator),
+            'validate_set(min_length=1, max_length=100)',
+        )
+
+        validator = validate_set(validator=validate_int(), required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_set(validator=validate_int(), required=False)',
+        )
 
 
 class ValidateMappingTestCase(unittest.TestCase):
@@ -169,6 +195,17 @@ class ValidateMappingTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator({"1": 1})
 
+    def test_repr(self):
+        validator = validate_mapping(
+            key_validator=validate_text(), value_validator=validate_int(),
+        )
+        self.assertEqual(
+            repr(validator),
+            'validate_mapping('
+            'key_validator=validate_text(), value_validator=validate_int()'
+            ')',
+        )
+
 
 class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
@@ -232,6 +269,13 @@ class ValidateStructureTestCase(unittest.TestCase):
             'expected': 1,
             'unexpected': 2,
         })
+
+    def test_repr(self):
+        validator = validate_structure(schema={'key': validate_int()})
+        self.assertEqual(
+            repr(validator),
+            'validate_structure(schema={\'key\': validate_int()})',
+        )
 
 
 class ValidateTupleTestCase(unittest.TestCase):

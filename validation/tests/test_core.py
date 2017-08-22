@@ -52,6 +52,13 @@ class ValidateIntTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(-1)
 
+    def test_repr(self):
+        validator = validate_int(min_value=1, max_value=1, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_int(min_value=1, max_value=1, required=False)',
+        )
+
 
 class ValidateFloatTestCase(unittest.TestCase):
     pass
@@ -83,6 +90,13 @@ class ValidateBoolTestCase(unittest.TestCase):
         validator(False)
         with self.assertRaises(TypeError):
             validator("false")
+
+    def test_repr(self):
+        validator = validate_bool(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_bool(required=False)',
+        )
 
 
 class ValidateTextTestCase(unittest.TestCase):
@@ -126,6 +140,19 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(u"123")
 
+    def test_repr(self):
+        validator = validate_text(pattern='hello world', required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_text(pattern=\'hello world\', required=False)',
+        )
+
+        validator = validate_text(min_length=4, max_length=10)
+        self.assertEqual(
+            repr(validator),
+            'validate_text(min_length=4, max_length=10)',
+        )
+
 
 class ValidateBytesTestCase(unittest.TestCase):
     def test_valid(self):
@@ -159,6 +186,13 @@ class ValidateBytesTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(b"123")
 
+    def test_repr(self):
+        validator = validate_bytes(min_length=4, max_length=10, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_bytes(min_length=4, max_length=10, required=False)',
+        )
+
 
 class ValidateDateTestCase(unittest.TestCase):
     def test_valid(self):
@@ -183,6 +217,13 @@ class ValidateDateTestCase(unittest.TestCase):
         validator(date.today())
         with self.assertRaises(TypeError):
             validator(datetime.now())
+
+    def test_repr(self):
+        validator = validate_date(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_date(required=False)',
+        )
 
 
 class ValidateDateTimeTestCase(unittest.TestCase):
@@ -212,3 +253,10 @@ class ValidateDateTimeTestCase(unittest.TestCase):
         validator(date.today())
         with self.assertRaises(TypeError):
             validator(datetime.now())
+
+    def test_repr(self):
+        validator = validate_datetime()
+        self.assertEqual(
+            repr(validator),
+            'validate_datetime()',
+        )

@@ -29,6 +29,44 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
         ).format(value=value, max=max_value))
 
 
+class _int_validator(object):
+    def __init__(self, min_value, max_value, required):
+        _validate_int(min_value, required=False)
+        self.__min_value = min_value
+
+        _validate_int(max_value, min_value=min_value, required=False)
+        self.__max_value = max_value
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_int(
+            value,
+            min_value=self.__min_value, max_value=self.__max_value,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__min_value is not None:
+            args.append(
+                'min_value={min_value!r}'.format(min_value=self.__min_value)
+            )
+
+        if self.__max_value is not None:
+            args.append('max_value={max_value!r}'.format(
+                max_value=self.__max_value,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_int({args})'.format(args=', '.join(args))
+
+
 def validate_int(
     value=_undefined,
     min_value=None, max_value=None,
@@ -58,15 +96,10 @@ def validate_int(
     :raises ValueError:
         If the value is not within bounds.
     """
-    _validate_int(min_value, required=False)
-    _validate_int(max_value, min_value=min_value, required=False)
-
-    def validate(value):
-        _validate_int(
-            value,
-            min_value=min_value, max_value=max_value,
-            required=required,
-        )
+    validate = _int_validator(
+        min_value=min_value, max_value=max_value,
+        required=required,
+    )
 
     if value is not _undefined:
         validate(value)
@@ -94,6 +127,24 @@ def _validate_bool(value, required=True):
         ).format(cls=value.__class__.__name__))
 
 
+class _bool_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_bool(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_bool({args})'.format(args=', '.join(args))
+
+
 def validate_bool(value=_undefined, required=True):
     """
     Checks that the target value is a valid boolean.
@@ -107,10 +158,7 @@ def validate_bool(value=_undefined, required=True):
         If the value is not a boolean, or if it was marked as `required` but
         `None` was passed in.
     """
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_bool(value, required=required)
+    validate = _bool_validator(required=required)
 
     if value is not _undefined:
         validate(value)
@@ -160,6 +208,68 @@ def _validate_text(
             )
 
 
+class _text_validator(object):
+    def __init__(self, min_length, max_length, pattern, required):
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+        if pattern is None:
+            compiled_pattern = pattern
+        elif isinstance(pattern, six.string_types):
+            # Note that we are a little more permissive about non-unicode
+            # patterns in python2 than we are about non-unicode arguments.
+            # Users will probably written the pattern argument inline.
+            compiled_pattern = re.compile(pattern)
+        else:
+            # `re` does not expose a class for regular expression objects, so
+            # it is not possible to do any validation here.
+            compiled_pattern = pattern
+
+        self.__pattern = pattern
+        self.__compiled_pattern = compiled_pattern
+
+    def __call__(self, value):
+        _validate_text(
+            value,
+            min_length=self.__min_length, max_length=self.__max_length,
+            pattern=self.__compiled_pattern, required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if self.__pattern is not None:
+            args.append('pattern={pattern!r}'.format(
+                pattern=self.__pattern,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_text({args})'.format(args=', '.join(args))
+
+
 def validate_text(
     value=_undefined,
     min_length=None, max_length=None,
@@ -206,31 +316,10 @@ def validate_text(
         If the value was longer or shorter than expected, or did not match
         the pattern.
     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
+    validate = _text_validator(
+        min_length=min_length, max_length=max_length,
+        pattern=pattern, required=required,
     )
-    _validate_bool(required)
-
-    if pattern is not None:
-        # Note that we are a little more permissive about non-unicode patterns
-        # in python2 than we are about non-unicode arguments.  Users will
-        # probably written the pattern argument inline.
-        if isinstance(pattern, six.string_types):
-            pattern = re.compile(pattern)
-
-        # `re` does not expose a class for regular expression objects, so it
-        # is not possible to do any validation here.
-
-    def validate(value):
-        _validate_text(
-            value,
-            min_length=min_length, max_length=max_length,
-            pattern=pattern,
-            required=required,
-        )
 
     if value is not _undefined:
         validate(value)
@@ -259,6 +348,49 @@ def _validate_bytes(value, min_length, max_length, required):
         raise ValueError((
             "expected at most {max} bytes, but bytestring contains {length}"
         ).format(length=len(value), max=max_length))
+
+
+class _bytes_validator(object):
+    def __init__(self, min_length, max_length, required):
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_bytes(
+            value,
+            min_length=self.__min_length,
+            max_length=self.__max_length,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_bytes({args})'.format(args=', '.join(args))
 
 
 def validate_bytes(
@@ -290,20 +422,11 @@ def validate_bytes(
     :raises ValueError:
         If the value was longer or shorter than expected.
     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
-    )
-    _validate_bool(required)
 
-    def validate(value):
-        _validate_bytes(
-            value,
-            min_length=min_length, max_length=max_length,
-            required=required,
-        )
+    validate = _bytes_validator(
+        min_length=min_length, max_length=max_length,
+        required=required,
+    )
 
     if value is not _undefined:
         validate(value)
@@ -326,6 +449,24 @@ def _validate_date(value, required=True):
         ).format(cls=value.__class__.__name__))
 
 
+class _date_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_date(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_date({args})'.format(args=', '.join(args))
+
+
 def validate_date(value=_undefined, required=True):
     """
     Checks that the value is a valid :class:`datetime.date` value.
@@ -339,8 +480,7 @@ def validate_date(value=_undefined, required=True):
         If the value is not a date, or if it was marked as `required` but
         None was passed in.
     """
-    def validate(value):
-        _validate_date(value, required=required)
+    validate = _date_validator(required=required)
 
     if value is not _undefined:
         validate(value)
@@ -365,6 +505,24 @@ def _validate_datetime(value, required=True):
         ))
 
 
+class _datetime_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_datetime(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_datetime({args})'.format(args=', '.join(args))
+
+
 def validate_datetime(value=_undefined, required=True):
     """
     Checks that the value is a valid :class:`datetime.datetime` value.
@@ -383,8 +541,7 @@ def validate_datetime(value=_undefined, required=True):
     :raises ValueError:
         If the value does not have a valid timezone.
     """
-    def validate(value):
-        _validate_datetime(value, required=required)
+    validate = _datetime_validator(required=required)
 
     if value is not _undefined:
         validate(value)
