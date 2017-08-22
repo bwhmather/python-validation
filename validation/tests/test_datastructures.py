@@ -109,6 +109,19 @@ class ValidateSetTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator({1, 2, 3, 4})
 
+    def test_repr(self):
+        validator = validate_set(min_length=1, max_length=100)
+        self.assertEqual(
+            repr(validator),
+            'validate_set(min_length=1, max_length=100)',
+        )
+
+        validator = validate_set(validator=validate_int(), required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_set(validator=validate_int(), required=False)',
+        )
+
 
 class ValidateMappingTestCase(unittest.TestCase):
     def test_basic_valid(self):
