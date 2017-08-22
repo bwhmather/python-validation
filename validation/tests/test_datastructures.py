@@ -53,6 +53,19 @@ class ValidateListTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator([1, 2, 3, 4])
 
+    def test_repr(self):
+        validator = validate_list(min_length=1, max_length=100)
+        self.assertEqual(
+            repr(validator),
+            'validate_list(min_length=1, max_length=100)',
+        )
+
+        validator = validate_list(validator=validate_int(), required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_list(validator=validate_int(), required=False)',
+        )
+
 
 class ValidateSetTestCase(unittest.TestCase):
     def test_empty_is_not_missing(self):
