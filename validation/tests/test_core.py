@@ -4,7 +4,7 @@ from validation import validate_bool
 
 
 class ValidateBoolTestCase(unittest.TestCase):
-    def test_valid(self):
+    def test_valid(self):  # type: () -> None
         validate_bool(True)
         validate_bool(False)
 
@@ -18,19 +18,19 @@ class ValidateBoolTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_bool("true")
 
-    def test_required(self):
+    def test_required(self):  # type: () -> None
         validate_bool(None, required=False)
 
         with self.assertRaises(TypeError):
             validate_bool(None)
 
-    def test_closure(self):
+    def test_closure(self):  # type: () -> None
         validator = validate_bool()
         validator(False)
         with self.assertRaises(TypeError):
-            validator("false")
+            validator(None)
 
-    def test_repr(self):
+    def test_repr(self):  # type: () -> None
         validator = validate_bool(required=False)
         self.assertEqual(
             repr(validator),

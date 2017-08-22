@@ -10,7 +10,7 @@ from validation import (
 
 
 class ValidateDateTestCase(unittest.TestCase):
-    def test_valid(self):
+    def test_valid(self):  # type: () -> None
         validate_date(date.today())
 
     def test_datetime(self):
@@ -21,7 +21,7 @@ class ValidateDateTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_date("1970-01-01")
 
-    def test_required(self):
+    def test_required(self):  # type: () -> None
         validate_date(None, required=False)
 
         with self.assertRaises(TypeError):
@@ -33,7 +33,7 @@ class ValidateDateTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator(datetime.now())
 
-    def test_repr(self):
+    def test_repr(self):  # type: () -> None
         validator = validate_date(required=False)
         self.assertEqual(
             repr(validator),
@@ -42,10 +42,10 @@ class ValidateDateTestCase(unittest.TestCase):
 
 
 class ValidateDateTimeTestCase(unittest.TestCase):
-    def test_valid(self):
+    def test_valid(self):  # type: () -> None
         validate_datetime(datetime.now(pytz.utc))
 
-    def test_no_timezone(self):
+    def test_no_timezone(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_datetime(datetime.now())
 
@@ -57,7 +57,7 @@ class ValidateDateTimeTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_date("1970-01-01T12:00:00+00:00")
 
-    def test_required(self):
+    def test_required(self):  # type: () -> None
         validate_date(None, required=False)
 
         with self.assertRaises(TypeError):
@@ -69,7 +69,7 @@ class ValidateDateTimeTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator(datetime.now())
 
-    def test_repr(self):
+    def test_repr(self):  # type: () -> None
         validator = validate_datetime()
         self.assertEqual(
             repr(validator),

@@ -9,7 +9,7 @@ from validation import validate_int, validate_float
 
 
 class ValidateIntTestCase(unittest.TestCase):
-    def test_valid(self):
+    def test_valid(self):  # type: () -> None
         validate_int(0)
         validate_int(1)
 
@@ -24,30 +24,30 @@ class ValidateIntTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_int(1.0)
 
-    def test_min(self):
+    def test_min(self):  # type: () -> None
         validate_int(5, min_value=5)
 
         with self.assertRaises(ValueError):
             validate_int(5, min_value=6)
 
-    def test_max(self):
+    def test_max(self):  # type: () -> None
         validate_int(5, max_value=5)
 
         with self.assertRaises(ValueError):
             validate_int(5, max_value=4)
 
-    def test_required(self):
+    def test_required(self):  # type: () -> None
         validate_int(None, required=False)
 
         with self.assertRaises(TypeError):
             validate_int(None)
 
-    def test_closure(self):
+    def test_closure(self):  # type: () -> None
         validator = validate_int(min_value=0)
         with self.assertRaises(ValueError):
             validator(-1)
 
-    def test_repr(self):
+    def test_repr(self):  # type: () -> None
         validator = validate_int(min_value=1, max_value=1, required=False)
         self.assertEqual(
             repr(validator),
@@ -56,7 +56,7 @@ class ValidateIntTestCase(unittest.TestCase):
 
 
 class ValidateFloatTestCase(unittest.TestCase):
-    def test_valid(self):
+    def test_valid(self):  # type: () -> None
         validate_float(1.0)
         validate_float(math.pi)
 
@@ -64,51 +64,51 @@ class ValidateFloatTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_float(1)
 
-    def test_allow_inf(self):
+    def test_allow_inf(self):  # type: () -> None
         validate_float(float('inf'), allow_infinite=True)
         validate_float(float('-inf'), allow_infinite=True)
 
-    def test_allow_nan(self):
+    def test_allow_nan(self):  # type: () -> None
         validate_float(float('nan'), allow_nan=True)
         validate_float(
             float('nan'), min_value=0.0, max_value=1.0, allow_nan=True,
         )
 
-    def test_disallow_float(self):
+    def test_disallow_infinite(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_float(float('inf'))
 
         with self.assertRaises(ValueError):
             validate_float(float('-inf'))
 
-    def test_disallow_nan(self):
+    def test_disallow_nan(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_float(float('nan'))
 
-    def test_min(self):
+    def test_min(self):  # type: () -> None
         validate_float(5.0, min_value=4.5)
 
         with self.assertRaises(ValueError):
             validate_float(5.0, min_value=5.5)
 
-    def test_max(self):
+    def test_max(self):  # type: () -> None
         validate_float(5.0, max_value=5.5)
 
         with self.assertRaises(ValueError):
             validate_float(5.0, max_value=4.5)
 
-    def test_required(self):
+    def test_required(self):  # type: () -> None
         validate_float(None, required=False)
 
         with self.assertRaises(TypeError):
             validate_float(None)
 
-    def test_closure(self):
+    def test_closure(self):  # type: () -> None
         validator = validate_float(min_value=0.0)
         with self.assertRaises(ValueError):
             validator(-1.0)
 
-    def test_repr(self):
+    def test_repr(self):  # type: () -> None
         validator = validate_float(
             min_value=1.0, max_value=1.0, required=False,
         )
