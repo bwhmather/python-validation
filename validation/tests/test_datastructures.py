@@ -195,6 +195,17 @@ class ValidateMappingTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator({"1": 1})
 
+    def test_repr(self):
+        validator = validate_mapping(
+            key_validator=validate_text(), value_validator=validate_int(),
+        )
+        self.assertEqual(
+            repr(validator),
+            'validate_mapping('
+            'key_validator=validate_text(), value_validator=validate_int()'
+            ')',
+        )
+
 
 class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
