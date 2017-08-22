@@ -52,6 +52,13 @@ class ValidateIntTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(-1)
 
+    def test_repr(self):
+        validator = validate_int(min_value=1, max_value=1, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_int(min_value=1, max_value=1, required=False)',
+        )
+
 
 class ValidateFloatTestCase(unittest.TestCase):
     pass
