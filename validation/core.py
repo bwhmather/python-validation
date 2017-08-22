@@ -127,6 +127,24 @@ def _validate_bool(value, required=True):
         ).format(cls=value.__class__.__name__))
 
 
+class _bool_validator(object):
+    def __init__(self, required):
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_bool(value, required=self.__required)
+
+    def __repr__(self):
+        args = []
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_bool({args})'.format(args=', '.join(args))
+
+
 def validate_bool(value=_undefined, required=True):
     """
     Checks that the target value is a valid boolean.
@@ -140,10 +158,7 @@ def validate_bool(value=_undefined, required=True):
         If the value is not a boolean, or if it was marked as `required` but
         `None` was passed in.
     """
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_bool(value, required=required)
+    validate = _bool_validator(required=required)
 
     if value is not _undefined:
         validate(value)
