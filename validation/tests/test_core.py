@@ -218,6 +218,13 @@ class ValidateDateTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator(datetime.now())
 
+    def test_repr(self):
+        validator = validate_date(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_date(required=False)',
+        )
+
 
 class ValidateDateTimeTestCase(unittest.TestCase):
     def test_valid(self):
