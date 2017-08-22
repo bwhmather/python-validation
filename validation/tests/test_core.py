@@ -253,3 +253,10 @@ class ValidateDateTimeTestCase(unittest.TestCase):
         validator(date.today())
         with self.assertRaises(TypeError):
             validator(datetime.now())
+
+    def test_repr(self):
+        validator = validate_datetime()
+        self.assertEqual(
+            repr(validator),
+            'validate_datetime()',
+        )
