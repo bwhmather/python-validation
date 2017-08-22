@@ -21,3 +21,12 @@ script:
 
 after_success:
   - "coveralls"
+
+deploy:
+  provider: pypi
+  distributions: "sdist --formats=zip"
+  user: "bwhmather-travis"
+  password:
+    secure: "n6tdaXJBm3gkBgKaN26TaotytZTi+unZFQDrAsEtzvb0AD4poOsYYumAvfXmF/c3aadAFWoD66ki2p00qv1unAGmkr+gkG3pvvYLnx++4jRkWo9D6inIRrSwxmlexJQTkFFfwmX5CMQx3F0tATM5PfztRdkVbIhKjbN7Q8nHUIDQOImHzwsZVyYwLOxb0FgLf6enQRURkVTusZa2R7GzGqqlhdeOURRoVgz6LwOu/9kzxiQcMaNUCV3uEJ9cIZYfVcmZG/2Hgsgb6dcEsMiBRwBbf7NXtxtHMdyQ+9ywKmKeiaiB5xhdequF8+k6kcrMVgEaRosFSTkvofJP7V/Z0ot9HAf94qOhm9lu3KWoNK6rpuXMsz7jpljUStqlL3Btu0x2dHDs5L0n/Tbq9VVbO0jSg8SoKKWlC+75IwvJjeGoSi2uGEGC9pcmOrNiGGe9T5Oz7aZMsJh9pH4prlcFlHnWWlmxd81OSxiQLf9CXSRDao/6cq6pCpXQ53Xn/aiRlsasT+aNUQNBRIVbD8sh2KHKsXB/k9yeL/rlnUSGH/btFUBYunpiTYtx9hkJvcN9GMzjbvpdylUB0Fkjav6UnuiWEoaowLOIfd8/kzaVl2GPuGjOtMPq63ErLX2CZruxAT9kKVUHQ/Jej0ujmMF6P3BkXjRI/cOU+51i49y3vKQ="
+  on:
+    branch: "master"
