@@ -22,6 +22,7 @@ def validate_int(
 def validate_float(
     value: float,
     *, min_value: float=None, max_value: float=None,
+    allow_infinite: bool=False, allow_nan: bool=False,
     required: bool=True,
 ) -> None:
     ...
@@ -30,6 +31,7 @@ def validate_float(
 @overload
 def validate_float(
     *, min_value: float=None, max_value: float=None,
+    allow_infinite: bool=False, allow_nan: bool=False,
     required: bool=True,
 ) -> Callable[[float], None]:
     ...
