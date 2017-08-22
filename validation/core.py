@@ -29,6 +29,44 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
         ).format(value=value, max=max_value))
 
 
+class _int_validator(object):
+    def __init__(self, min_value, max_value, required):
+        _validate_int(min_value, required=False)
+        self.__min_value = min_value
+
+        _validate_int(max_value, min_value=min_value, required=False)
+        self.__max_value = max_value
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_int(
+            value,
+            min_value=self.__min_value, max_value=self.__max_value,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__min_value is not None:
+            args.append(
+                'min_value={min_value!r}'.format(min_value=self.__min_value)
+            )
+
+        if self.__max_value is not None:
+            args.append('max_value={max_value!r}'.format(
+                max_value=self.__max_value,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_int({args})'.format(args=', '.join(args))
+
+
 def validate_int(
     value=_undefined,
     min_value=None, max_value=None,
@@ -58,15 +96,10 @@ def validate_int(
     :raises ValueError:
         If the value is not within bounds.
     """
-    _validate_int(min_value, required=False)
-    _validate_int(max_value, min_value=min_value, required=False)
-
-    def validate(value):
-        _validate_int(
-            value,
-            min_value=min_value, max_value=max_value,
-            required=required,
-        )
+    validate = _int_validator(
+        min_value=min_value, max_value=max_value,
+        required=required,
+    )
 
     if value is not _undefined:
         validate(value)
