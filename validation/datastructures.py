@@ -419,6 +419,49 @@ def _validate_structure(
             ))
 
 
+class _structure_validator(object):
+    def __init__(self, schema, allow_extra, required):
+        _validate_structure(schema, schema=None, required=False)
+        if schema is not None:
+            # Make a copy of the schema to make sure it won't be mutated while
+            # we are using it.
+            schema = dict(schema)
+        self.__schema = schema
+
+        _validate_bool(allow_extra)
+        self.__allow_extra = allow_extra
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_structure(
+            value,
+            schema=self.__schema,
+            allow_extra=self.__allow_extra,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__schema is not None:
+            args.append('schema={schema!r}'.format(
+                schema=self.__schema,
+            ))
+
+        if self.__allow_extra:
+            args.append('allow_extra={allow_extra!r}'.format(
+                required=self.__allow_extra,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_structure({args})'.format(args=', '.join(args))
+
+
 def validate_structure(
     value=_undefined,
     schema=None, allow_extra=False,
@@ -451,20 +494,9 @@ def validate_structure(
     :param bool required:
         Whether the value can't be `None`. Defaults to True.
     """
-    _validate_structure(schema, schema=None, required=False)
-    _validate_bool(allow_extra)
-    _validate_bool(required)
-
-    # Make a copy of the schema to make sure it won't be mutated under us.
-    if schema is not None:
-        schema = dict(schema)
-
-    def validate(value):
-        _validate_structure(
-            value,
-            schema=schema, allow_extra=allow_extra,
-            required=required,
-        )
+    validate = _structure_validator(
+        schema=schema, allow_extra=allow_extra, required=required,
+    )
 
     if value is not _undefined:
         validate(value)
