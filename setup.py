@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='validation',
     url='https://github.com/JOIVY/validation',
-    version='0.0.1',
+    version='0.1.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
