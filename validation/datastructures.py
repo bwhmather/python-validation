@@ -77,6 +77,55 @@ def _validate_list(
                 raise
 
 
+class _list_validator(object):
+    def __init__(self, validator, min_length, max_length, required):
+        self.__validator = validator
+
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_list(
+            value, validator=self.__validator,
+            min_length=self.__min_length, max_length=self.__max_length,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__validator is not None:
+            args.append('validator={validator!r}'.format(
+                validator=self.__validator,
+            ))
+
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_list({args})'.format(args=', '.join(args))
+
+
 def validate_list(
     value=_undefined,
     validator=None,
@@ -99,21 +148,11 @@ def validate_list(
         length is not checked.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
-     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
+    """
+    validate = _list_validator(
+        min_length=min_length, max_length=max_length,
+        validator=validator, required=required,
     )
-    _validate_bool(required)
-
-    def validate(value):
-        _validate_list(
-            value, validator=validator,
-            min_length=min_length, max_length=max_length,
-            required=required,
-        )
 
     if value is not _undefined:
         validate(value)
