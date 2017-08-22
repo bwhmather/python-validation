@@ -208,6 +208,68 @@ def _validate_text(
             )
 
 
+class _text_validator(object):
+    def __init__(self, min_length, max_length, pattern, required):
+        _validate_int(max_length, min_value=0, required=False)
+        self.__max_length = max_length
+
+        # The max_value check here is fine.  If max_length is None then there
+        # is no cap on the min_length.  We do validate max_length first though.
+        _validate_int(
+            min_length, min_value=0, max_value=max_length, required=False,
+        )
+        self.__min_length = min_length
+
+        _validate_bool(required)
+        self.__required = required
+
+        if pattern is None:
+            compiled_pattern = pattern
+        elif isinstance(pattern, six.string_types):
+            # Note that we are a little more permissive about non-unicode
+            # patterns in python2 than we are about non-unicode arguments.
+            # Users will probably written the pattern argument inline.
+            compiled_pattern = re.compile(pattern)
+        else:
+            # `re` does not expose a class for regular expression objects, so
+            # it is not possible to do any validation here.
+            compiled_pattern = pattern
+
+        self.__pattern = pattern
+        self.__compiled_pattern = compiled_pattern
+
+    def __call__(self, value):
+        _validate_text(
+            value,
+            min_length=self.__min_length, max_length=self.__max_length,
+            pattern=self.__compiled_pattern, required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__min_length is not None:
+            args.append('min_length={min_length!r}'.format(
+                min_length=self.__min_length,
+            ))
+
+        if self.__max_length is not None:
+            args.append('max_length={max_length!r}'.format(
+                max_length=self.__max_length,
+            ))
+
+        if self.__pattern is not None:
+            args.append('pattern={pattern!r}'.format(
+                pattern=self.__pattern,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_text({args})'.format(args=', '.join(args))
+
+
 def validate_text(
     value=_undefined,
     min_length=None, max_length=None,
@@ -254,31 +316,10 @@ def validate_text(
         If the value was longer or shorter than expected, or did not match
         the pattern.
     """
-    _validate_int(max_length, min_value=0, required=False)
-    # The max_value check here is fine.  If max_length is None then there is no
-    # cap on the min_length.  We do validate max_length first though.
-    _validate_int(
-        min_length, min_value=0, max_value=max_length, required=False,
+    validate = _text_validator(
+        min_length=min_length, max_length=max_length,
+        pattern=pattern, required=required,
     )
-    _validate_bool(required)
-
-    if pattern is not None:
-        # Note that we are a little more permissive about non-unicode patterns
-        # in python2 than we are about non-unicode arguments.  Users will
-        # probably written the pattern argument inline.
-        if isinstance(pattern, six.string_types):
-            pattern = re.compile(pattern)
-
-        # `re` does not expose a class for regular expression objects, so it
-        # is not possible to do any validation here.
-
-    def validate(value):
-        _validate_text(
-            value,
-            min_length=min_length, max_length=max_length,
-            pattern=pattern,
-            required=required,
-        )
 
     if value is not _undefined:
         validate(value)
