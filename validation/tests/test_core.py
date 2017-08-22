@@ -91,6 +91,13 @@ class ValidateBoolTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator("false")
 
+    def test_repr(self):
+        validator = validate_bool(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_bool(required=False)',
+        )
+
 
 class ValidateTextTestCase(unittest.TestCase):
     def test_valid(self):
