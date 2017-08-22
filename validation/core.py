@@ -31,10 +31,17 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
 
 class _int_validator(object):
     def __init__(self, min_value, max_value, required):
-        _validate_int(min_value, required=False)
-        self.__min_value = min_value
+        _validate_int(min_value, min_value=0, required=False)
+        _validate_int(max_value, min_value=0, required=False)
+        if (
+            min_value is not None and max_value is not None and
+            min_value > max_value
+        ):
+            raise ValueError((
+                'minimum value {min!r} is greater than maximum value {max!r}'
+            ).format(min=min_value, max=max_value))
 
-        _validate_int(max_value, min_value=min_value, required=False)
+        self.__min_value = min_value
         self.__max_value = max_value
 
         _validate_bool(required)
@@ -210,15 +217,18 @@ def _validate_text(
 
 class _text_validator(object):
     def __init__(self, min_length, max_length, pattern, required):
+        _validate_int(min_length, min_value=0, required=False)
         _validate_int(max_length, min_value=0, required=False)
-        self.__max_length = max_length
+        if (
+            min_length is not None and max_length is not None and
+            min_length > max_length
+        ):
+            raise ValueError((
+                'minimum length {min!r} is greater than maximum length {max!r}'
+            ).format(min=min_length, max=max_length))
 
-        # The max_value check here is fine.  If max_length is None then there
-        # is no cap on the min_length.  We do validate max_length first though.
-        _validate_int(
-            min_length, min_value=0, max_value=max_length, required=False,
-        )
         self.__min_length = min_length
+        self.__max_length = max_length
 
         _validate_bool(required)
         self.__required = required
@@ -352,15 +362,18 @@ def _validate_bytes(value, min_length, max_length, required):
 
 class _bytes_validator(object):
     def __init__(self, min_length, max_length, required):
+        _validate_int(min_length, min_value=0, required=False)
         _validate_int(max_length, min_value=0, required=False)
-        self.__max_length = max_length
+        if (
+            min_length is not None and max_length is not None and
+            min_length > max_length
+        ):
+            raise ValueError((
+                'minimum length {min!r} is greater than maximum length {max!r}'
+            ).format(min=min_length, max=max_length))
 
-        # The max_value check here is fine.  If max_length is None then there
-        # is no cap on the min_length.  We do validate max_length first though.
-        _validate_int(
-            min_length, min_value=0, max_value=max_length, required=False,
-        )
         self.__min_length = min_length
+        self.__max_length = max_length
 
         _validate_bool(required)
         self.__required = required
