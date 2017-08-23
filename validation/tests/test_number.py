@@ -68,10 +68,53 @@ class ValidateFloatTestCase(unittest.TestCase):
         validate_float(float('inf'), allow_infinite=True)
         validate_float(float('-inf'), allow_infinite=True)
 
+    def test_allow_positive_inf_with_bounds(self):
+        validate_float(float('inf'), min_value=0.0, allow_infinite=True)
+
+        with self.assertRaises(ValueError):
+            validate_float(float('inf'), max_value=0.0, allow_infinite=True)
+
+        # Passing infinite as the upper bound suggests that the user doesn't
+        # want an upper bound.  Infinite should be acceptable.
+        validate_float(
+            float('inf'), max_value=float('inf'), allow_infinite=True,
+        )
+        # Allowing only positive infinite when the minimum value is positive
+        # infinite is the only behaviour that could reasonably be considered
+        # useful.
+        validate_float(
+            float('inf'), min_value=float('inf'), allow_infinite=True,
+        )
+
+    def test_allow_negative_inf_with_bounds(self):
+        validate_float(float('-inf'), max_value=0.0, allow_infinite=True)
+
+        with self.assertRaises(ValueError):
+            validate_float(float('-inf'), min_value=0.0, allow_infinite=True)
+
+        # Passing infinite as the lower bound suggests that the user doesn't
+        # want a lower bound.  Negative infinite should be acceptable.
+        validate_float(
+            float('-inf'), min_value=float('-inf'), allow_infinite=True,
+        )
+        # Allowing only negative infinite when the maximum value is negative
+        # infinite is the only behaviour that could reasonably be considered
+        # useful.
+        validate_float(
+            float('-inf'), max_value=float('-inf'), allow_infinite=True,
+        )
+
     def test_allow_nan(self):  # type: () -> None
         validate_float(float('nan'), allow_nan=True)
+
+    def test_allow_nan_with_bounds(self):
         validate_float(
-            float('nan'), min_value=0.0, max_value=1.0, allow_nan=True,
+            float('nan'), min_value=-1.0, max_value=1.0, allow_nan=True,
+        )
+        validate_float(
+            float('nan'),
+            min_value=float('-inf'), max_value=float('inf'),
+            allow_nan=True,
         )
 
     def test_disallow_infinite(self):  # type: () -> None
