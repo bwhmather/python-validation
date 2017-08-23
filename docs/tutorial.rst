@@ -84,11 +84,40 @@ As an example, to validate two mutually exclusive arguments:
 
         ...
 
+We recommend that the validation functions only be called with static
+constraints.
+Even where it is possible to use dynamic constraints to check a value
+
+
+This example could be implemented by passing ``lower`` as ``min_value`` to
+``validate_int`` when checking ``upper``, but there is a risk that the
+
+.. code:: python
+
+    def clamp(value, *, lower, upper):
+        validate_int(lower)
+        validate_int(upper)
+
+        if lower > upper:
+            raise ValueError((
+                'lower bound {lower!r} is greater than upper bound {upper!r}'
+            ).format(lower=lower, upper=upper))
+
+        return min(max(lower, value), upper)
+
+
+Validating iterators
+~~~~~~~~~~~~~~~~~~~~
+
 The validation functions cannot handle iterators directly as attempting to do
 so would consume the iterator.
 
+For the same reason we have not included a generic function for validating any
+iterable.
+
+
 You have two options:
-Validating iterables.  ``list`` then ``validate_list``, or validate in loop.
+``list`` then ``validate_list``, or validate in loop.
 
 .. code:: python
 
@@ -109,7 +138,6 @@ Validating iterables.  ``list`` then ``validate_list``, or validate in loop.
             # Do something
             ...
 
-
 Creating new validators
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -128,5 +156,4 @@ Catch validation errors at the top level.
 
 Alternate validation and assignment to make it clear when validation is
 missing.
-
 
