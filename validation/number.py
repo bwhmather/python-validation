@@ -32,8 +32,8 @@ def _validate_int(value, min_value=None, max_value=None, required=True):
 
 class _int_validator(object):
     def __init__(self, min_value, max_value, required):
-        _validate_int(min_value, min_value=0, required=False)
-        _validate_int(max_value, min_value=0, required=False)
+        _validate_int(min_value, required=False)
+        _validate_int(max_value, required=False)
         if (
             min_value is not None and max_value is not None and
             min_value > max_value
@@ -160,11 +160,12 @@ class _float_validator(object):
         required,
     ):
         _validate_float(
-            min_value, min_value=0.0, allow_infinite=True, required=False,
+            min_value, allow_infinite=True, required=False,
         )
         _validate_float(
-            max_value, min_value=0.0, allow_infinite=True, required=False,
+            max_value, allow_infinite=True, required=False,
         )
+
         if (
             min_value is not None and max_value is not None and
             min_value > max_value
