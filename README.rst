@@ -16,6 +16,8 @@ A python library for runtime type checking and validation of python values.
 
 Intended as a stepping stone towards static typing.
 
+Developed at `Joivy Ltd <https://joivy.com>` and open-sourced with permission.  Development moved from `https://github.com/JOIVY/validation` to `https://github.com/bwhmather/python-validation` in order to enable continuous integration.
+
 
 Installation
 ------------
