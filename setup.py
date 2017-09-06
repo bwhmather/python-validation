@@ -8,7 +8,7 @@ setup(
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
-    license='BSD',
+    license='Apache Software License',
     description=(
         "A library for runtime type checking and validation of python values"
     ),
