@@ -3,11 +3,11 @@ Python Validation
 
 |build-status| |coverage|
 
-.. |build-status| image:: https://travis-ci.org/JOIVY/validation/g.png?branch=develop
-    :target: https://travis-ci.org/JOIVY/validation/g
+.. |build-status| image:: https://travis-ci.org/JOIVY/validation.png?branch=develop
+    :target: https://travis-ci.org/JOIVY/validation
     :alt: Build Status
-.. |coverage| image:: https://coveralls.io/repos/JOIVY/validation/g/badge.png?branch=develop
-    :target: https://coveralls.io/r/JOIVY/validation/g?branch=develop
+.. |coverage| image:: https://coveralls.io/repos/JOIVY/validation/badge.png?branch=develop
+    :target: https://coveralls.io/r/JOIVY/validation?branch=develop
     :alt: Coverage
 
 .. begin-docs
