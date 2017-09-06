@@ -22,7 +22,6 @@ script:
 
 after_success:
   - "coveralls"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" = '3.6' ]; then cd docs && make html; fi"
 
 before_deploy:
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" = '3.6' ]; then make -C docs html; fi"
