@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='validation',
-    url='https://github.com/JOIVY/validation',
+    url='https://github.com/bwhmather/python-validation',
     version='0.1.1',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
