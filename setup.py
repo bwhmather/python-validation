@@ -1,6 +1,10 @@
 from setuptools import setup, find_packages
 
 
+with open('README.rst') as _readme_file:
+    readme = _readme_file.read()
+
+
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
@@ -12,7 +16,7 @@ setup(
     description=(
         "A library for runtime type checking and validation of python values"
     ),
-    long_description=__doc__,
+    long_description=readme,
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
