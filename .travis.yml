@@ -28,6 +28,14 @@ before_deploy:
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" = '3.6' ]; then make -C docs html; fi"
 
 deploy:
+  - provider: pages
+    skip_cleanup: true
+    local_dir: "docs/_build/html"
+    target_branch: "gh-pages"
+    github_token: "$GITHUB_TOKEN"
+    on:
+      branch: "master"
+      condition: "\"${TRAVIS_PYTHON_VERSION}\" = '3.6'"
   - provider: pypi
     distributions: "sdist --formats=zip"
     user: "bwhmather-travis"
