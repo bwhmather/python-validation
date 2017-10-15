@@ -15,7 +15,7 @@ Contents
 .. toctree::
   :maxdepth: 2
 
-  tutorial
+  guide
 
 .. toctree::
   :maxdepth: 1

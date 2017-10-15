@@ -3,11 +3,11 @@ Python Validation
 
 |build-status| |coverage|
 
-.. |build-status| image:: https://travis-ci.org/JOIVY/validation/g.png?branch=develop
-    :target: https://travis-ci.org/JOIVY/validation/g
+.. |build-status| image:: https://travis-ci.org/bwhmather/python-validation.png?branch=develop
+    :target: https://travis-ci.org/bwhmather/python-validation
     :alt: Build Status
-.. |coverage| image:: https://coveralls.io/repos/JOIVY/validation/g/badge.png?branch=develop
-    :target: https://coveralls.io/r/JOIVY/validation/g?branch=develop
+.. |coverage| image:: https://coveralls.io/repos/bwhmather/python-validation/badge.png?branch=develop
+    :target: https://coveralls.io/r/bwhmather/python-validation?branch=develop
     :alt: Coverage
 
 .. begin-docs
@@ -15,6 +15,8 @@ Python Validation
 A python library for runtime type checking and validation of python values.
 
 Intended as a stepping stone towards static typing.
+
+Developed at `Joivy Ltd <https://joivy.com>`_ and open-sourced with permission.  Development temporarily moved from `JOIVY/validation <https://github.com/JOIVY/validation>`_ to `bwhmather/python-validation <https://github.com/bwhmather/python-validation>`_ in order to enable continuous integration.
 
 
 Installation
@@ -80,9 +82,9 @@ No logic is run until validation is complete.
 Links
 -----
 
-- Source code: https://github.com/JOIVY/validation
-- Issue tracker: https://github.com/JOIVY/validation/issues
-- Continuous integration: https://travis-ci.org/JOIVY/validation
+- Source code: https://github.com/bwhmather/python-validation
+- Issue tracker: https://github.com/bwhmather/python-validation/issues
+- Continuous integration: https://travis-ci.org/bwhmather/python-validation
 - PyPI: https://pypi.python.org/pypi/validation
 
 

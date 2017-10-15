@@ -2,7 +2,8 @@ import sys
 
 import six
 
-from .core import _validate_int, _validate_bool
+from .core import _validate_bool
+from .number import _validate_int
 
 
 _undefined = object()
@@ -81,15 +82,18 @@ class _list_validator(object):
     def __init__(self, validator, min_length, max_length, required):
         self.__validator = validator
 
+        _validate_int(min_length, min_value=0, required=False)
         _validate_int(max_length, min_value=0, required=False)
-        self.__max_length = max_length
+        if (
+            min_length is not None and max_length is not None and
+            min_length > max_length
+        ):
+            raise ValueError((
+                'minimum length {min!r} is greater than maximum length {max!r}'
+            ).format(min=min_length, max=max_length))
 
-        # The max_value check here is fine.  If max_length is None then there
-        # is no cap on the min_length.  We do validate max_length first though.
-        _validate_int(
-            min_length, min_value=0, max_value=max_length, required=False,
-        )
         self.__min_length = min_length
+        self.__max_length = max_length
 
         _validate_bool(required)
         self.__required = required
@@ -196,15 +200,18 @@ class _set_validator(object):
     def __init__(self, validator, min_length, max_length, required):
         self.__validator = validator
 
+        _validate_int(min_length, min_value=0, required=False)
         _validate_int(max_length, min_value=0, required=False)
-        self.__max_length = max_length
+        if (
+            min_length is not None and max_length is not None and
+            min_length > max_length
+        ):
+            raise ValueError((
+                'minimum length {min!r} is greater than maximum length {max!r}'
+            ).format(min=min_length, max=max_length))
 
-        # The max_value check here is fine.  If max_length is None then there
-        # is no cap on the min_length.  We do validate max_length first though.
-        _validate_int(
-            min_length, min_value=0, max_value=max_length, required=False,
-        )
         self.__min_length = min_length
+        self.__max_length = max_length
 
         _validate_bool(required)
         self.__required = required
