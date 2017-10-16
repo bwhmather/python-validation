@@ -1,4 +1,5 @@
 import sys
+import itertools
 
 import six
 
@@ -511,12 +512,126 @@ def validate_structure(
         return validate
 
 
-def validate_tuple(
-    value=_undefined,
+def _validate_tuple(
+    value,
     schema=None,
+    length=None,
     required=True,
 ):
-    raise NotImplementedError()
+    if value is None:
+        if not required:
+            return
+        raise TypeError("required value is None")
+
+    if not isinstance(value, tuple):
+        raise TypeError((
+            "expected 'tuple' but value is of type {cls!r}"
+        ).format(cls=value.__class__.__name__))
+
+    # If a schema is provided, its length takes priority over then value in
+    # the length argument.  `_tuple_validator` is responsible for ensuring
+    # that the two are mutually exclusive.
+    if schema is not None:
+        length = len(schema)
+
+    if length is not None and len(value) != length:
+        raise TypeError((
+            "expected tuple of length {expected} "
+            "but value is of length {actual}"
+        ).format(expected=length, actual=len(value)))
+
+    if schema is not None:
+        for index, entry, validator in zip(itertools.count(), value, schema):
+            try:
+                validator(entry)
+            except (TypeError, ValueError, KeyError):
+                _try_contextualize_exception(
+                    "invalid value at index {index}".format(index=index),
+                )
+
+
+class _tuple_validator(object):
+    def __init__(self, length, schema, required):
+        if length is not None and schema is not None:
+            raise TypeError(
+                "length and schema arguments are mutually exclusive",
+            )
+
+        _validate_int(length, required=False)
+        self.__length = length
+
+        _validate_tuple(schema, schema=None, required=False)
+        self.__schema = schema
+
+        _validate_bool(required)
+        self.__required = required
+
+    def __call__(self, value):
+        _validate_tuple(
+            value,
+            length=self.__length,
+            schema=self.__schema,
+            required=self.__required,
+        )
+
+    def __repr__(self):
+        args = []
+        if self.__schema is not None:
+            args.append('schema={schema!r}'.format(
+                schema=self.__schema,
+            ))
+
+        if not self.__required:
+            args.append('required={required!r}'.format(
+                required=self.__required,
+            ))
+
+        return 'validate_tuple({args})'.format(args=', '.join(args))
+
+
+def validate_tuple(
+    value=_undefined,
+    schema=None, length=None,
+    required=True,
+):
+    """
+    Validates a tuple, checking it against an optional schema.
+
+    The schema should be a tuple of validator functions, with each validator
+    corresponding to an entry in the value to be checked.
+
+    As an alternative, `validate_tuple` can accept a `length` argument.  Unlike
+    the validators for other sequence types, `validate_tuple` will always
+    enforce an exact length.  This is because the length of a tuple is part of
+    its type.
+
+    A simple example:
+
+    .. code:: python
+
+        validator = validate_tuple(schema=(
+            validate_int(), validate_int(), validate_int(),
+        ))
+        validator((1, 2, 3))
+
+    :param tuple value:
+        The value to be validated.
+    :param tuple schema:
+        An optional schema against which the value should be checked.
+    :param int length:
+        The maximum length of the tuple.  `schema` and `length` arguments
+        are mutually exclusive and must not be passed at the same time.
+    :param bool required:
+        Whether the value can't be `None`. Defaults to True.
+    """
+    validate = _tuple_validator(
+        length=length, schema=schema, required=required,
+    )
+
+    if value is not _undefined:
+        validate(value)
+    else:
+        return validate
 
 
 def validate_enum(

@@ -4,6 +4,7 @@ from validation import (
     validate_int, validate_text,
     validate_list, validate_set,
     validate_mapping, validate_structure,
+    validate_tuple,
 )
 
 
@@ -279,7 +280,76 @@ class ValidateStructureTestCase(unittest.TestCase):
 
 
 class ValidateTupleTestCase(unittest.TestCase):
-    pass
+    def test_basic_valid(self):
+        validate_tuple((1, 'string'))
+
+    def test_schema_length_mutually_exclusive(self):
+        with self.assertRaises(TypeError):
+            validate_tuple(schema=(validate_int(),), length=1)
+
+    def test_schema_valid(self):
+        validator = validate_tuple(schema=(
+            validate_text(), validate_int(),
+        ))
+
+        validator((u"hello world", 9001))
+
+    def test_schema_invalid_value_type(self):
+        validator = validate_tuple(schema=(
+            validate_text(), validate_int(),
+        ))
+
+        with self.assertRaises(TypeError):
+            validator((u"string", '1000'))
+
+    def test_schema_invalid_value(self):
+        validator = validate_tuple(schema=(
+            validate_text(), validate_int(min_value=0),
+        ))
+
+        with self.assertRaises(ValueError):
+            validator((u"string", -1))
+
+    def test_schema_positional_argument(self):
+        def validator(*args):
+            assert len(args) == 1
+
+        validate_tuple((u"value",), schema=(validator,))
+
+    def test_schema_too_long(self):
+        validator = validate_tuple(schema=(validate_int(), validate_int()))
+
+        with self.assertRaises(TypeError):
+            validator((1, 2, 3))
+
+    def test_schema_too_short(self):
+        validator = validate_tuple(schema=(validate_int(), validate_int()))
+
+        with self.assertRaises(TypeError):
+            validator((1,))
+
+    def test_length_too_long(self):
+        validator = validate_tuple(length=2)
+
+        with self.assertRaises(TypeError):
+            validator((1, 2, 3))
+
+    def test_length_too_short(self):
+        validator = validate_tuple(length=2)
+
+        with self.assertRaises(TypeError):
+            validator((1,))
+
+    def test_length_just_right(self):
+        validator = validate_tuple(length=2)
+        validator((1, 2))
+
+    def test_repr(self):
+        validator = validate_tuple(schema=(validate_int(),))
+        self.assertEqual(
+            repr(validator),
+            'validate_tuple(schema=(validate_int(),))',
+        )
 
 
 class ValidateEnumTestCase(unittest.TestCase):
