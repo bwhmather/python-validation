@@ -91,6 +91,7 @@ def validate_tuple(
     value: Tuple,
     *, required: bool=False,
     schema: Tuple=None,
+    length: int=None,
 ) -> None:
     ...
 
@@ -99,6 +100,7 @@ def validate_tuple(
 def validate_tuple(
     *, required: bool=False,
     schema: Tuple=None,
+    length: int=None,
 ) -> Callable[[Tuple], None]:
     ...
 
