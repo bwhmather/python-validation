@@ -351,6 +351,57 @@ class ValidateTupleTestCase(unittest.TestCase):
             'validate_tuple(schema=(validate_int(),))',
         )
 
+    def test_reraise_builtin(self):
+        thrown = TypeError("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_tuple(("value",), schema=(inner,))
+        caught = cm.exception
+
+        self.assertIsNot(caught, thrown)
+        self.assertEqual(str(caught), "invalid value at index 0:  message")
+
+    def test_reraise_builtin_nomessage(self):
+        thrown = TypeError()
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_tuple(("value",), schema=(inner,))
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_nonstring(self):
+        thrown = ValueError(1)
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_tuple(("value",), schema=(inner,))
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_subclass(self):
+        class DerivedException(ValueError):
+            pass
+        thrown = DerivedException("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_tuple(("value",), schema=(inner,))
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
 
 class ValidateEnumTestCase(unittest.TestCase):
     pass
