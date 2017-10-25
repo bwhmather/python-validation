@@ -548,6 +548,7 @@ def _validate_tuple(
                 _try_contextualize_exception(
                     "invalid value at index {index}".format(index=index),
                 )
+                raise
 
 
 class _tuple_validator(object):
