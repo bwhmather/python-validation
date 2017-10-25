@@ -67,6 +67,57 @@ class ValidateListTestCase(unittest.TestCase):
             'validate_list(validator=validate_int(), required=False)',
         )
 
+    def test_reraise_builtin(self):
+        thrown = TypeError("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_list([1], validator=inner)
+        caught = cm.exception
+
+        self.assertIsNot(caught, thrown)
+        self.assertEqual(str(caught), "invalid item at position 0:  message")
+
+    def test_reraise_builtin_nomessage(self):
+        thrown = TypeError()
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_list([2], validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_nonstring(self):
+        thrown = ValueError(1)
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_list([3], validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_subclass(self):
+        class DerivedException(ValueError):
+            pass
+        thrown = DerivedException("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_list(["value"], validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
 
 class ValidateSetTestCase(unittest.TestCase):
     def test_empty_is_not_missing(self):
