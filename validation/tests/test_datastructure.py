@@ -278,6 +278,57 @@ class ValidateStructureTestCase(unittest.TestCase):
             'validate_structure(schema={\'key\': validate_int()})',
         )
 
+    def test_reraise_builtin(self):
+        thrown = TypeError("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_structure({'two': 2}, schema={'two': inner})
+        caught = cm.exception
+
+        self.assertIsNot(caught, thrown)
+        self.assertEqual(str(caught), "invalid value for key 'two':  message")
+
+    def test_reraise_builtin_nomessage(self):
+        thrown = TypeError()
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_structure({'one': 1}, schema={'one': inner})
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_nonstring(self):
+        thrown = ValueError(1)
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_structure({'three': 3}, schema={'three': inner})
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_dont_reraise_builtin_subclass(self):
+        class DerivedException(ValueError):
+            pass
+        thrown = DerivedException("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_tuple(("value",), schema=(inner,))
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
 
 class ValidateTupleTestCase(unittest.TestCase):
     def test_basic_valid(self):
