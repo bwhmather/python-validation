@@ -258,6 +258,108 @@ class ValidateMappingTestCase(unittest.TestCase):
             ')',
         )
 
+    def test_key_reraise_builtin(self):
+        thrown = TypeError("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_mapping({'one': 1}, key_validator=inner)
+        caught = cm.exception
+
+        self.assertIsNot(caught, thrown)
+        self.assertEqual(str(caught), "invalid key 'one':  message")
+
+    def test_key_reraise_builtin_nomessage(self):
+        thrown = TypeError()
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_mapping({'two': 2}, key_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_key_dont_reraise_builtin_nonstring(self):
+        thrown = ValueError(1)
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_mapping({'three': 3}, key_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_key_dont_reraise_builtin_subclass(self):
+        class DerivedException(ValueError):
+            pass
+        thrown = DerivedException("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_mapping({'key': "value"}, key_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_value_reraise_builtin(self):
+        thrown = TypeError("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_mapping({'one': 1}, value_validator=inner)
+        caught = cm.exception
+
+        self.assertIsNot(caught, thrown)
+        self.assertEqual(str(caught), "invalid value for key 'one':  message")
+
+    def test_value_reraise_builtin_nomessage(self):
+        thrown = TypeError()
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(TypeError) as cm:
+            validate_mapping({'two': 2}, value_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_value_dont_reraise_builtin_nonstring(self):
+        thrown = ValueError(1)
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_mapping({'three': 3}, value_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
+    def test_value_dont_reraise_builtin_subclass(self):
+        class DerivedException(ValueError):
+            pass
+        thrown = DerivedException("message")
+
+        def inner(value):
+            raise thrown
+
+        with self.assertRaises(ValueError) as cm:
+            validate_mapping({'key': "value"}, value_validator=inner)
+        caught = cm.exception
+
+        self.assertIs(caught, thrown)
+
 
 class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
