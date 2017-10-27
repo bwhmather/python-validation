@@ -1,3 +1,45 @@
+"""
+This module contains functions for validating plain data-structures.
+
+These functions typically expect a function for one or more of their arguments.
+These functions will be used to check entry, key or value that that the
+data-structure contains.
+Validator functions in this library will return a closure when called with no
+value argument that can be used for this purpose.
+
+    >>> values = [1, 2, 3, 4]
+    >>> validate_list(values, validator=validate_int(min_value=0))
+
+Where supported, standard exceptions raised by an inner validator will be
+re-raised with some additional context.
+Unfortunately we can't wrap custom exceptions, and python 2 cannot be not
+supported.
+
+There is no single ``validate_dict`` function.
+Dictionaries can be validated either as a mapping, that maps between keys of
+one type and values of another, using :func:`validate_mapping`, or as struct
+like objects, that map predefined keys to values with key specific types, using
+:func:`validate_structure`.
+
+The relationship between :func:`validate_list` and :func:`validate_tuple` is
+similar.  :func:`validate_list` expects the list to be homogeneous, while
+:func:`validate_tuple` will check each entry with its own validation function.
+
+
+Sequences
+---------
+
+.. autofunction:: validate_list
+.. autofunction:: validate_set
+.. autofunction:: validate_tuple
+
+
+Dictionaries
+------------
+
+.. autofunction:: validate_mapping
+.. autofunction:: validate_structure
+"""
 import sys
 import itertools
 
