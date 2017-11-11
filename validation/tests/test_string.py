@@ -1,4 +1,5 @@
 import unittest
+import re
 
 from validation import validate_text, validate_bytes
 
@@ -31,6 +32,15 @@ class ValidateTextTestCase(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             validate_text(u"begin end", pattern=r"begin")
+
+    def test_precompiled_pattern(self):  # type: () -> None
+        validate_text(u"a----b", pattern=re.compile(r"a-*b"))
+
+        with self.assertRaises(ValueError):
+            validate_text(u"begin end", pattern=re.compile(r"end"))
+
+        with self.assertRaises(ValueError):
+            validate_text(u"begin end", pattern=re.compile(r"begin"))
 
     def test_required(self):  # type: () -> None
         validate_text(None, required=False)
