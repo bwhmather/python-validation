@@ -521,7 +521,7 @@ class _structure_validator(object):
 
         if self.__allow_extra:
             args.append('allow_extra={allow_extra!r}'.format(
-                required=self.__allow_extra,
+                allow_extra=self.__allow_extra,
             ))
 
         if not self.__required:
