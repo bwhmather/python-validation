@@ -118,6 +118,22 @@ class ValidateListTestCase(unittest.TestCase):
 
         self.assertIs(caught, thrown)
 
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_list(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_list(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_list(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_list(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_list(min_length=10, max_length=9)
+
 
 class ValidateSetTestCase(unittest.TestCase):
     def test_empty_is_not_missing(self):
@@ -173,6 +189,22 @@ class ValidateSetTestCase(unittest.TestCase):
             repr(validator),
             'validate_set(validator=validate_int(), required=False)',
         )
+
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_set(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_set(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_set(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_set(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_set(min_length=10, max_length=9)
 
 
 class ValidateMappingTestCase(unittest.TestCase):

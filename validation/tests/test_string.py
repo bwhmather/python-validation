@@ -57,6 +57,22 @@ class ValidateTextTestCase(unittest.TestCase):
             'validate_text(min_length=4, max_length=10)',
         )
 
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_text(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_text(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_text(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_text(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_text(min_length=10, max_length=9)
+
 
 class ValidateBytesTestCase(unittest.TestCase):
     def test_valid(self):  # type: () -> None
@@ -96,3 +112,19 @@ class ValidateBytesTestCase(unittest.TestCase):
             repr(validator),
             'validate_bytes(min_length=4, max_length=10, required=False)',
         )
+
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_bytes(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_bytes(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_bytes(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_bytes(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_bytes(min_length=10, max_length=9)
