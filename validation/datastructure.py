@@ -1,19 +1,35 @@
 """
 This module contains functions for validating plain data-structures.
 
-These functions typically expect a function for one or more of their arguments.
-These functions will be used to check entry, key or value that that the
-data-structure contains.
-Validator functions in this library will return a closure when called with no
-value argument that can be used for this purpose.
+These functions typically expect to be passed another validator function for
+one or more of their arguments, that will be used to check every entry, key or
+value that that the data-structure contains.
+All validator functions in this library, when called with no value argument,
+will return a closure that is intended to be used in this context.
 
-    >>> values = [1, 2, 3, 4]
+As an example, to check that a list contains only positive integers, you can
+call :func:`~validation.number.validate_int` with ``min_value`` equal to zero
+to create a closure that will check for positive integers, and pass it as the
+``validator`` argument to :func:`validate_list`.
+
+    >>> from validation import validate_int
+    >>> values = [3, 2, 1, -1]
     >>> validate_list(values, validator=validate_int(min_value=0))
+    Traceback (most recent call last):
+    ...
+    ValueError: invalid item at position 3:  expected value less than 0, but \
+got -1
 
-Where supported, standard exceptions raised by an inner validator will be
-re-raised with some additional context.
-Unfortunately we can't wrap custom exceptions, and python 2 cannot be not
-supported.
+Note that the exception raised here is not the exception that was raised by
+:func:`~validation.number.validate_int`.
+For the subset of built-in exceptions that can be raised, in normal usage, by
+validators in this library - namely :exc:`TypeError`, :exc:`ValueError` and
+:exc:`KeyError` - we will attempt to create and raise a copy of the original
+with additional context information added to the message.
+The other built-in exceptions don't make sense as validation errors and so we
+don't try to catch them.
+There doesn't appear to be a safe way to extend custom exceptions so these are
+also left alone.
 
 There is no single ``validate_dict`` function.
 Dictionaries can be validated either as a mapping, that maps between keys of
