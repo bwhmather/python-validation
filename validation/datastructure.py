@@ -647,6 +647,11 @@ class _tuple_validator(object):
                 schema=self.__schema,
             ))
 
+        if self.__length is not None:
+            args.append('length={length!r}'.format(
+                length=self.__length,
+            ))
+
         if not self.__required:
             args.append('required={required!r}'.format(
                 required=self.__required,
