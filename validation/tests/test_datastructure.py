@@ -258,6 +258,12 @@ class ValidateMappingTestCase(unittest.TestCase):
             ')',
         )
 
+        validator = validate_mapping(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_mapping(required=False)',
+        )
+
     def test_key_reraise_builtin(self):
         thrown = TypeError("message")
 
@@ -431,6 +437,12 @@ class ValidateStructureTestCase(unittest.TestCase):
             'validate_structure(schema={\'key\': validate_int()})',
         )
 
+        validator = validate_structure(allow_extra=True, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_structure(allow_extra=True, required=False)',
+        )
+
     def test_reraise_builtin(self):
         thrown = TypeError("message")
 
@@ -553,6 +565,12 @@ class ValidateTupleTestCase(unittest.TestCase):
         self.assertEqual(
             repr(validator),
             'validate_tuple(schema=(validate_int(),))',
+        )
+
+        validator = validate_tuple(length=2, required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_tuple(length=2, required=False)',
         )
 
     def test_reraise_builtin(self):

@@ -521,7 +521,7 @@ class _structure_validator(object):
 
         if self.__allow_extra:
             args.append('allow_extra={allow_extra!r}'.format(
-                required=self.__allow_extra,
+                allow_extra=self.__allow_extra,
             ))
 
         if not self.__required:
@@ -645,6 +645,11 @@ class _tuple_validator(object):
         if self.__schema is not None:
             args.append('schema={schema!r}'.format(
                 schema=self.__schema,
+            ))
+
+        if self.__length is not None:
+            args.append('length={length!r}'.format(
+                length=self.__length,
             ))
 
         if not self.__required:
