@@ -42,6 +42,13 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_text(u"begin end", pattern=re.compile(r"begin"))
 
+    def test_invalid_pattern(self):
+        with self.assertRaises(TypeError):
+            validate_text(pattern=lambda string: None)
+
+        with self.assertRaises(Exception):
+            validate_text(pattern=r"(")
+
     def test_required(self):  # type: () -> None
         validate_text(None, required=False)
 
