@@ -54,6 +54,16 @@ class ValidateIntTestCase(unittest.TestCase):
             'validate_int(min_value=1, max_value=1, required=False)',
         )
 
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_int(min_value='1')
+
+        with self.assertRaises(TypeError):
+            validate_int(max_value='1')
+
+        with self.assertRaises(ValueError):
+            validate_int(min_value=10, max_value=9)
+
 
 class ValidateFloatTestCase(unittest.TestCase):
     def test_valid(self):  # type: () -> None
