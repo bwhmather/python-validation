@@ -190,6 +190,22 @@ class ValidateSetTestCase(unittest.TestCase):
             'validate_set(validator=validate_int(), required=False)',
         )
 
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_set(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_set(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_set(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_set(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_set(min_length=10, max_length=9)
+
 
 class ValidateMappingTestCase(unittest.TestCase):
     def test_basic_valid(self):
