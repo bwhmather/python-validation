@@ -75,3 +75,9 @@ class ValidateDateTimeTestCase(unittest.TestCase):
             repr(validator),
             'validate_datetime()',
         )
+
+        validator = validate_datetime(required=False)
+        self.assertEqual(
+            repr(validator),
+            'validate_datetime(required=False)',
+        )
