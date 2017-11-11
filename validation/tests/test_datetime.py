@@ -55,19 +55,19 @@ class ValidateDateTimeTestCase(unittest.TestCase):
 
     def test_invalid_type(self):
         with self.assertRaises(TypeError):
-            validate_date("1970-01-01T12:00:00+00:00")
+            validate_datetime("1970-01-01T12:00:00+00:00")
 
     def test_required(self):  # type: () -> None
-        validate_date(None, required=False)
+        validate_datetime(None, required=False)
 
         with self.assertRaises(TypeError):
-            validate_date(None)
+            validate_datetime(None)
 
     def test_closure(self):
-        validator = validate_date()
-        validator(date.today())
+        validator = validate_datetime()
+        validator(datetime.now(pytz.utc))
         with self.assertRaises(TypeError):
-            validator(datetime.now())
+            validator(date.today())
 
     def test_repr(self):  # type: () -> None
         validator = validate_datetime()
