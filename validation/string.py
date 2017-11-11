@@ -6,7 +6,7 @@ import re
 # ``_pattern_type`` class in ``re``.
 try:
     from typing.re import Pattern as _pattern_type
-except ImportError:
+except ImportError:  # pragma: no cover
     _pattern_type = re._pattern_type
 
 import six
