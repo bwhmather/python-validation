@@ -567,10 +567,10 @@ class ValidateTupleTestCase(unittest.TestCase):
             'validate_tuple(schema=(validate_int(),))',
         )
 
-        validator = validate_tuple(required=False)
+        validator = validate_tuple(length=2, required=False)
         self.assertEqual(
             repr(validator),
-            'validate_tuple(required=False)',
+            'validate_tuple(length=2, required=False)',
         )
 
     def test_reraise_builtin(self):
