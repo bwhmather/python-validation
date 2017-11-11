@@ -118,6 +118,22 @@ class ValidateListTestCase(unittest.TestCase):
 
         self.assertIs(caught, thrown)
 
+    def test_check_requested_bounds(self):
+        with self.assertRaises(TypeError):
+            validate_list(min_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_list(min_length=-1)
+
+        with self.assertRaises(TypeError):
+            validate_list(max_length='1')
+
+        with self.assertRaises(ValueError):
+            validate_list(max_length=-1)
+
+        with self.assertRaises(ValueError):
+            validate_list(min_length=10, max_length=9)
+
 
 class ValidateSetTestCase(unittest.TestCase):
     def test_empty_is_not_missing(self):
