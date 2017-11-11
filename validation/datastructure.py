@@ -421,6 +421,10 @@ def validate_mapping(
     Validates a dictionary representing a simple mapping from keys of one type
     to values of another.
 
+    For validating dictionaries representing structured data, where the keys
+    are known ahead of time and values can have different constraints depending
+    on the key, use :func:`validate_struct`.
+
     :param dict value:
         The value to be validated.
     :param func key_validator:
@@ -540,6 +544,9 @@ def validate_structure(
     The schema should be a dictionary, with keys corresponding to the expected
     keys in `value`, but with the values replaced by functions which will be
     called to with the corresponding value in the input.
+
+    For validating dictionaries that represent a mapping from one set of values
+    to another, use :func:`validate_mapping`.
 
     A simple example:
 
