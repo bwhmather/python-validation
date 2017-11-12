@@ -409,6 +409,10 @@ class ValidateStructureTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_structure(None)
 
+    def test_invalid_container_type(self):
+        with self.assertRaises(TypeError):
+            validate_structure([])
+
     def test_schema_valid(self):
         validator = validate_structure(schema={
             'hello': validate_text(),
