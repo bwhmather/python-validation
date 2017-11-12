@@ -549,6 +549,16 @@ class ValidateTupleTestCase(unittest.TestCase):
     def test_basic_valid(self):
         validate_tuple((1, 'string'))
 
+    def test_required(self):
+        validate_structure(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_structure(None)
+
+    def test_invalid_container_type(self):
+        with self.assertRaises(TypeError):
+            validate_structure([])
+
     def test_schema_length_mutually_exclusive(self):
         with self.assertRaises(TypeError):
             validate_tuple(schema=(validate_int(),), length=1)
