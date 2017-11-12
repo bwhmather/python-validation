@@ -8,7 +8,11 @@ from . import (
     test_bytes,
     test_date,
     test_datetime,
-    test_datastructure,
+    test_list,
+    test_set,
+    test_mapping,
+    test_structure,
+    test_tuple,
 )
 
 
@@ -21,5 +25,9 @@ suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_bytes),  # type: ignore
     loader.loadTestsFromModule(test_date),  # type: ignore
     loader.loadTestsFromModule(test_datetime),  # type: ignore
-    loader.loadTestsFromModule(test_datastructure),  # type: ignore
+    loader.loadTestsFromModule(test_list),  # type: ignore
+    loader.loadTestsFromModule(test_set),  # type: ignore
+    loader.loadTestsFromModule(test_mapping),  # type: ignore
+    loader.loadTestsFromModule(test_structure),  # type: ignore
+    loader.loadTestsFromModule(test_tuple),  # type: ignore
 ))
