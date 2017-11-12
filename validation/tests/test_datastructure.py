@@ -403,6 +403,12 @@ class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
         validate_structure({'hello': "world"})
 
+    def test_required(self):
+        validate_structure(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_structure(None)
+
     def test_schema_valid(self):
         validator = validate_structure(schema={
             'hello': validate_text(),
