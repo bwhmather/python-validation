@@ -462,6 +462,14 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'unexpected': 2,
             })
 
+    def test_schema_missing_key(self):
+        validator = validate_structure(schema={
+            'expected': validate_int(),
+        })
+
+        with self.assertRaises(KeyError):
+            validator({})
+
     def test_schema_allow_extra(self):
         validator = validate_structure(schema={
             'expected': validate_int(),
