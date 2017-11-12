@@ -18,7 +18,7 @@ from .datetime import (
 from .datastructure import (
     validate_list, validate_set,
     validate_mapping, validate_structure,
-    validate_tuple, validate_enum,
+    validate_tuple,
 )
 
 __all__ = [
@@ -27,5 +27,5 @@ __all__ = [
     'validate_date', 'validate_datetime',
     'validate_list', 'validate_set',
     'validate_mapping', 'validate_structure',
-    'validate_tuple', 'validate_enum',
+    'validate_tuple',
 ]
