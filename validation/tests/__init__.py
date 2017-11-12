@@ -1,7 +1,7 @@
 import unittest
 
 from . import (
-    test_core,
+    test_bool,
     test_number,
     test_string,
     test_datetime,
@@ -11,7 +11,7 @@ from . import (
 
 loader = unittest.TestLoader()
 suite = unittest.TestSuite((
-    loader.loadTestsFromModule(test_core),  # type: ignore
+    loader.loadTestsFromModule(test_bool),  # type: ignore
     loader.loadTestsFromModule(test_number),  # type: ignore
     loader.loadTestsFromModule(test_string),  # type: ignore
     loader.loadTestsFromModule(test_datetime),  # type: ignore
