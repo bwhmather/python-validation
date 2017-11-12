@@ -403,6 +403,16 @@ class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):
         validate_structure({'hello': "world"})
 
+    def test_required(self):
+        validate_structure(None, required=False)
+
+        with self.assertRaises(TypeError):
+            validate_structure(None)
+
+    def test_invalid_container_type(self):
+        with self.assertRaises(TypeError):
+            validate_structure([])
+
     def test_schema_valid(self):
         validator = validate_structure(schema={
             'hello': validate_text(),
@@ -451,6 +461,14 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'expected': 1,
                 'unexpected': 2,
             })
+
+    def test_schema_missing_key(self):
+        validator = validate_structure(schema={
+            'expected': validate_int(),
+        })
+
+        with self.assertRaises(KeyError):
+            validator({})
 
     def test_schema_allow_extra(self):
         validator = validate_structure(schema={
