@@ -555,6 +555,10 @@ class ValidateTupleTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_structure(None)
 
+    def test_invalid_container_type(self):
+        with self.assertRaises(TypeError):
+            validate_structure([])
+
     def test_schema_length_mutually_exclusive(self):
         with self.assertRaises(TypeError):
             validate_tuple(schema=(validate_int(),), length=1)
