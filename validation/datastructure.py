@@ -703,11 +703,3 @@ def validate_tuple(
         validate(value)
     else:
         return validate
-
-
-def validate_enum(
-    value=_undefined,
-    kind=None,
-    required=True,
-):
-    raise NotImplementedError()

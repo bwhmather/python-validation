@@ -673,7 +673,3 @@ class ValidateTupleTestCase(unittest.TestCase):
         caught = cm.exception
 
         self.assertIs(caught, thrown)
-
-
-class ValidateEnumTestCase(unittest.TestCase):
-    pass
