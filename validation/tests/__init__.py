@@ -6,6 +6,7 @@ from . import (
     test_float,
     test_text,
     test_bytes,
+    test_date,
     test_datetime,
     test_datastructure,
 )
@@ -18,6 +19,7 @@ suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_float),  # type: ignore
     loader.loadTestsFromModule(test_text),  # type: ignore
     loader.loadTestsFromModule(test_bytes),  # type: ignore
+    loader.loadTestsFromModule(test_date),  # type: ignore
     loader.loadTestsFromModule(test_datetime),  # type: ignore
     loader.loadTestsFromModule(test_datastructure),  # type: ignore
 ))
