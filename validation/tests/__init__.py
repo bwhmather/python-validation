@@ -2,7 +2,8 @@ import unittest
 
 from . import (
     test_bool,
-    test_number,
+    test_int,
+    test_float,
     test_string,
     test_datetime,
     test_datastructure,
@@ -12,7 +13,8 @@ from . import (
 loader = unittest.TestLoader()
 suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_bool),  # type: ignore
-    loader.loadTestsFromModule(test_number),  # type: ignore
+    loader.loadTestsFromModule(test_int),  # type: ignore
+    loader.loadTestsFromModule(test_float),  # type: ignore
     loader.loadTestsFromModule(test_string),  # type: ignore
     loader.loadTestsFromModule(test_datetime),  # type: ignore
     loader.loadTestsFromModule(test_datastructure),  # type: ignore
