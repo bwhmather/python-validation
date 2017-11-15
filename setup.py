@@ -8,7 +8,7 @@ with open('README.rst') as _readme_file:
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.2.0',
+    version='0.3.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
