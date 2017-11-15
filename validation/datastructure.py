@@ -82,7 +82,11 @@ def _try_contextualize_exception(context):
     # validation function in normal operation.  Stuff like :exc:`SyntaxError`
     # probably indicates something more fundamental, for which the original
     # exception is more useful.
-    supported_exceptions = (TypeError, ValueError, KeyError)
+    supported_exceptions = (
+        TypeError, ValueError,
+        KeyError, IndexError,
+        AssertionError
+    )
 
     if exc_type not in supported_exceptions:
         # No safe way to extend the message for subclasses.
