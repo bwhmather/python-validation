@@ -23,9 +23,10 @@ got -1
 Note that the exception raised here is not the exception that was raised by
 :func:`~validation.number.validate_int`.
 For the subset of built-in exceptions that can be raised, in normal usage, by
-validators in this library - namely :exc:`TypeError`, :exc:`ValueError` and
-:exc:`KeyError` - we will attempt to create and raise a copy of the original
-with additional context information added to the message.
+validators in this library - namely :exc:`TypeError`, :exc:`ValueError`,
+:exc:`KeyError`, :exc:`IndexError` and :exc:`AssertionError` - we will attempt
+to create and raise a copy of the original with additional context information
+added to the message.
 The other built-in exceptions don't make sense as validation errors and so we
 don't try to catch them.
 There doesn't appear to be a safe way to extend custom exceptions so these are
@@ -70,15 +71,26 @@ _undefined = object()
 
 def _try_contextualize_exception(context):
     """
-    Attempts to re-raise a `TypeError` or `ValueError` with a description of
-    the context.
+    Will attempt to re-raise a caught :exc:`TypeError`, :exc:`ValueError`,
+    :exc:`KeyError, :exc:`IndexError` or :exc:`AssertionError` with a
+    description of the context.
 
-    If the original error does not match the expected form, will simply return
-    without raising anything.
+    If the original error does not match the expected form, or is not one of
+    the supported types, will simply return without raising anything.
     """
     exc_type, exc_value, exc_traceback = sys.exc_info()
 
-    if exc_type not in (TypeError, ValueError, KeyError):
+    # The list of built-in exceptions that it seems likely will be raised by a
+    # validation function in normal operation.  Stuff like :exc:`SyntaxError`
+    # probably indicates something more fundamental, for which the original
+    # exception is more useful.
+    supported_exceptions = (
+        TypeError, ValueError,
+        KeyError, IndexError,
+        AssertionError
+    )
+
+    if exc_type not in supported_exceptions:
         # No safe way to extend the message for subclasses.
         return
 
