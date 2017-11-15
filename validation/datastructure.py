@@ -92,7 +92,7 @@ def _try_contextualize_exception(context):
     if not isinstance(exc_value.args[0], str):
         return
 
-    message = "{context}:  {message}".format(
+    message = "{context}: {message}".format(
         context=context, message=exc_value.args[0],
     )
 
