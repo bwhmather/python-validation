@@ -1,5 +1,4 @@
 from typing import Callable, List, Set, Tuple, Dict, Type, TypeVar, overload
-from enum import Enum
 from datetime import date, datetime
 
 
@@ -91,6 +90,7 @@ def validate_tuple(
     value: Tuple,
     *, required: bool=False,
     schema: Tuple=None,
+    length: int=None,
 ) -> None:
     ...
 
@@ -99,25 +99,6 @@ def validate_tuple(
 def validate_tuple(
     *, required: bool=False,
     schema: Tuple=None,
+    length: int=None,
 ) -> Callable[[Tuple], None]:
-    ...
-
-
-E = TypeVar('E', bound=Enum)
-
-
-@overload
-def validate_enum(
-    value: E,
-    *, kind: Type[E],
-    required: bool=True,
-) -> None:
-    ...
-
-
-@overload
-def validate_enum(
-    *, kind: Type[E],
-    required: bool=True,
-) -> Callable[[E], None]:
     ...

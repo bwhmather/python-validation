@@ -50,27 +50,4 @@ Other
 Datastructure Validation Functions
 ==================================
 
-.. module:: validation.datastructure
-
-Functions for validating plain data-structures.
-
-
-Sequences
----------
-
-.. autofunction:: validate_list
-.. autofunction:: validate_set
-.. autofunction:: validate_tuple
-
-
-Dictionaries
-------------
-
-.. autofunction:: validate_mapping
-.. autofunction:: validate_structure
-
-
-Enumerations
-------------
-
-.. autofunction:: validate_enum
+.. automodule:: validation.datastructure

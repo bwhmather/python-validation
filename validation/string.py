@@ -1,5 +1,14 @@
 import re
 
+# The typing module provides an abstract base class that we can check compiled
+# regular expressions against.  Unfortunately this wasn't available until
+# python 3.5.  For older versions of python, we fall back to using the private
+# ``_pattern_type`` class in ``re``.
+try:
+    from typing.re import Pattern as _pattern_type
+except ImportError:  # pragma: no cover
+    _pattern_type = re._pattern_type
+
 import six
 
 from .core import _validate_bool
@@ -76,10 +85,13 @@ class _text_validator(object):
             # patterns in python2 than we are about non-unicode arguments.
             # Users will probably written the pattern argument inline.
             compiled_pattern = re.compile(pattern)
-        else:
-            # `re` does not expose a class for regular expression objects, so
-            # it is not possible to do any validation here.
+        elif isinstance(pattern, _pattern_type):
             compiled_pattern = pattern
+        else:
+            raise TypeError((
+                "expected compiled regex or string, "
+                "but pattern is of type {cls!r}"
+            ).format(cls=pattern.__class__.__name__))
 
         self.__pattern = pattern
         self.__compiled_pattern = compiled_pattern
@@ -150,7 +162,7 @@ def validate_text(
     :param int max_length:
         The maximum acceptable length for the string.  By default, the length
         is not checked.
-    :param str|re.SRE_Pattern pattern:
+    :param str|re.Pattern pattern:
         Regular expression to check the value against.
     :param bool required:
         Whether the value can be `None`.  Defaults to `True`.
