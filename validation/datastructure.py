@@ -78,7 +78,13 @@ def _try_contextualize_exception(context):
     """
     exc_type, exc_value, exc_traceback = sys.exc_info()
 
-    if exc_type not in (TypeError, ValueError, KeyError):
+    # The list of built-in exceptions that it seems likely will be raised by a
+    # validation function in normal operation.  Stuff like :exc:`SyntaxError`
+    # probably indicates something more fundamental, for which the original
+    # exception is more useful.
+    supported_exceptions = (TypeError, ValueError, KeyError)
+
+    if exc_type not in supported_exceptions:
         # No safe way to extend the message for subclasses.
         return
 
