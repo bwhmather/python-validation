@@ -73,7 +73,7 @@ class ValidateListTestCase(unittest.TestCase):
         caught = cm.exception
 
         self.assertIsNot(caught, thrown)
-        self.assertEqual(str(caught), "invalid item at position 0:  message")
+        self.assertEqual(str(caught), "invalid item at position 0: message")
 
     def test_reraise_builtin_nomessage(self):
         thrown = TypeError()

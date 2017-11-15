@@ -108,7 +108,7 @@ class ValidateStructureTestCase(unittest.TestCase):
         caught = cm.exception
 
         self.assertIsNot(caught, thrown)
-        self.assertEqual(str(caught), "invalid value for key 'two':  message")
+        self.assertEqual(str(caught), "invalid value for key 'two': message")
 
     def test_reraise_builtin_nomessage(self):
         thrown = TypeError()

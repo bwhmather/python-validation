@@ -103,7 +103,7 @@ class ValidateMappingTestCase(unittest.TestCase):
         caught = cm.exception
 
         self.assertIsNot(caught, thrown)
-        self.assertEqual(str(caught), "invalid key 'one':  message")
+        self.assertEqual(str(caught), "invalid key 'one': message")
 
     def test_key_reraise_builtin_nomessage(self):
         thrown = TypeError()
@@ -154,7 +154,7 @@ class ValidateMappingTestCase(unittest.TestCase):
         caught = cm.exception
 
         self.assertIsNot(caught, thrown)
-        self.assertEqual(str(caught), "invalid value for key 'one':  message")
+        self.assertEqual(str(caught), "invalid value for key 'one': message")
 
     def test_value_reraise_builtin_nomessage(self):
         thrown = TypeError()
