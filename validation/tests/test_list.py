@@ -19,7 +19,7 @@ class ValidateListTestCase(unittest.TestCase):
 
     def test_validate_set(self):
         with self.assertRaises(TypeError):
-            validate_list({1}, validator=validate_int())
+            validate_list(set([1]), validator=validate_int())
 
     def test_validate_iterator(self):
         with self.assertRaises(TypeError):
