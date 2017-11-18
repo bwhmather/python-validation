@@ -1,4 +1,6 @@
-import unittest
+from __future__ import absolute_import
+
+from . import unittest
 
 from validation import validate_int, validate_set
 

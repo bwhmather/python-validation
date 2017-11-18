@@ -1,5 +1,6 @@
-import unittest
+from __future__ import absolute_import
 
+from . import unittest
 from datetime import date, datetime
 
 import pytz

@@ -1,9 +1,17 @@
+import sys
+
 from setuptools import setup, find_packages
 
 
 with open('README.rst') as _readme_file:
     readme = _readme_file.read()
 
+
+tests_require = [
+    'pytz',
+]
+if sys.version_info < (2, 7):
+    tests_require += ['unittest2']
 
 setup(
     name='validation',
@@ -30,9 +38,7 @@ setup(
     install_requires=[
         'six >= 1.10, < 2',
     ],
-    tests_require=[
-        'pytz',
-    ],
+    tests_require=tests_require,
     packages=find_packages(),
     package_data={
         '': ['*.pyi'],

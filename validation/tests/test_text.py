@@ -1,4 +1,6 @@
-import unittest
+from __future__ import absolute_import
+
+from . import unittest
 import re
 
 from validation import validate_text
