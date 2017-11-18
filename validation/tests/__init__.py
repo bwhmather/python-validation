@@ -1,4 +1,8 @@
-import unittest
+import sys
+if sys.version_info < (2, 7):  # pragma: no cover
+    import unittest2 as unittest
+else:
+    import unittest
 
 from . import (
     test_bool,
@@ -13,7 +17,7 @@ from . import (
     test_mapping,
     test_structure,
     test_tuple,
-)
+)  # noqa:
 
 
 loader = unittest.TestLoader()

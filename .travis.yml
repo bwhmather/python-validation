@@ -1,6 +1,7 @@
 language: python
 sudo: false
 python:
+  - "2.6"
   - "2.7"
   - "3.4"
   - "3.5"
@@ -11,20 +12,20 @@ install:
   - "pip install coveralls"
   - "pip install pyflakes"
   - "pip install pycodestyle"
-  - "pip install pylint"
-  - "pip install sphinx"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pylint; fi"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then pip install sphinx; fi"
 
 script:
   - "coverage run --source=validation setup.py test"
   - "pycodestyle validation setup.py"
   - "pyflakes validation setup.py"
-  - "pylint -E validation setup.py"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pylint -E validation setup.py; fi"
 
 after_success:
   - "coveralls"
 
 before_deploy:
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" = '3.6' ]; then make -C docs html; fi"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then make -C docs html; fi"
 
 deploy:
   - provider: pages
