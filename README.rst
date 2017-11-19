@@ -12,17 +12,19 @@ Python Validation
 
 .. begin-docs
 
-A simple python library, intended to reduce the amount of boilerplate required
-to check pre-conditions on arguments to functions.
+A simple python library containing functions that check python values.
+It is intended to make it easy to verify commonly expected pre-conditions on
+arguments to functions.
+
 
 What `validation` does:
 ~~~~~~~~~~~~~~~~~~~~~~~
-
 Functions validate their first argument or return a closure.
 
 Functions check values against a semantic type, not a concrete type.
-``validate_structure`` and ``validate_mapping`` are provided to validate
-dictionaries.  ``validate_text`` exists, but we also provide special validators
+``validate_structure`` and ``validate_mapping`` both expect dictionaries, but
+differ in whether they treat the keys as names or keys.
+``validate_text`` exists, but we also provide special validators
 for email addresses and domain names.
 
 Functions are fairly strict by default.
@@ -55,69 +57,17 @@ issues in preparation for making the jump to python 3.
 Developed at `Joivy Ltd <https://joivy.com>`_ and open-sourced with permission.
 
 
-
-
-
-A simple python library that provides helper functions to perform runtime type
-checking and validation at api boundaries.
-``validation`` is a python library for runtime type checking and validation of
-python values.
-
-It is intended to reduce the amount of boilerplate required to check simple
-pre-conditions on arguments to functions.
-It does not attempt to provide a full featured schema definition language for
-validating untrusted data.
-It also does not attempt to perform any coercion or sanitization of values.
-
-The library provides a number of simple functions that take a value to check as
-their first argument, and apply a number of
-
-If called without a value argument, validator functions will return a closure
-that can be used by other validators to check more complex data-structures.
-
-
-Provides:
-  - Semantically useful checks.
-  - Acceptable, developer focused error messages
-  - A conventions for defining new validation functions for non-standard data-
-    types.
-
-Does not provide:
-  - A full schema definition language.  Typical usage will restrict what is accepted, not declare what is required.
-  - Documentation generation.
-  - An embedded language for checking complex data-structures.
-
-Where it makes sense users are expected to drop back to using raw python.
-
-
-By default, validation is fairly strict
-Focused on checking inputs to python libraries
-
-Does not provide a language for defining schemas
-
-Intended as a stepping stone towards static typing.
-
-
-As this library is a useful tool for cleaning up established codebases, it will
-continue to support python 2.7 for the foreseeable future.
-The string validation functions are particularly handy for sorting out unicode
-issues in preparation for making the jump to python 3.
-
-Developed at `Joivy Ltd <https://joivy.com>`_ and open-sourced with permission.
-
-
 Installation
 ------------
 .. begin-installation
 
-Recommended method is to use the version from `pypi <https://pypi.python.org/pypi/validation>`_
+The ``validation`` library is available on `pypi <https://pypi.python.org/pypi/validation>`_.
+
+It can be installed manually using pip.
 
 .. code:: bash
 
     $ pip install validation
-
-
-Please note that this library only supports python version 2.7, and versions 3.4 and later.
 
 .. end-installation
 
