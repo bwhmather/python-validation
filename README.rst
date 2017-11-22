@@ -19,7 +19,10 @@ arguments to functions.
 
 What `validation` does:
 ~~~~~~~~~~~~~~~~~~~~~~~
-Functions validate their first argument or return a closure.
+This library contains a number of functions that accept a single positional
+argument which they will chech
+This library contains a number of functions that will check their first
+argument if one is provided, or return a closure that can be used later.
 
 Functions check values against a semantic type, not a concrete type.
 ``validate_structure`` and ``validate_mapping`` both expect dictionaries, but
@@ -28,21 +31,30 @@ differ in whether they treat the keys as names or keys.
 for email addresses and domain names.
 
 Functions are fairly strict by default.
-Designed to be mixed with normal python code to perform more complex validation
 
+Intended to be mixed with normal python code to perform more complex
+validation.
+As an example, the library provides no tools to assert that to values are
+mutually exclusive as this requirement is much more clearly expressed with a
+simple ``if`` block.
 
+Basic support for validating simple data-structures is implemented.
 
 What `validation` does not:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This is not a schema definition language.
-Not introspectable.  Designed to be used imperatively and inline.
+The ``validation`` library is not a schema definition language.
+Validation functions and closures are not designed to be introspectable, and
+are expected to be used inline.
 
-It is not intended for validating serialized data/json.
-It does, however, provide some help validating structured and unstructured
-dictionaries, as well as other data-structures.
+It is not intended for validating serialized, or partially serialized data.
+While there is some support for validating structured dictionaries, it does not
+extend to handling any of the many ways to represent a sum types in json.
+More complicated data-structures should generally be represented as classes,
+and validation pushed to the constructors.
 
-It does not perform sanitization.
-The point of this library is to catch mistakes, not paper over them
+Finally, the ``validation`` library does not perform any kind of sanitization.
+Its purpose is to catch mistakes, not paper over them.
+Values passed in to the library will not be modified.
 
 
 Compatibility
@@ -51,8 +63,6 @@ As this library is a useful tool for cleaning up established codebases, it will
 continue to support python 2.7 for the foreseeable future.
 The string validation functions are particularly handy for sorting out unicode
 issues in preparation for making the jump to python 3.
-
-
 
 Developed at `Joivy Ltd <https://joivy.com>`_ and open-sourced with permission.
 
