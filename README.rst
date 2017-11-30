@@ -31,12 +31,10 @@ It can be installed manually using pip.
 
     $ pip install validation
 
-
 As this library is a useful tool for cleaning up established codebases, it will
-continue to support python 2.7 for the foreseeable future.
+continue to support python 2.6 and 2.7 for the foreseeable future.
 The string validation functions are particularly handy for sorting out unicode
 issues in preparation for making the jump to python 3.
-
 
 .. end-installation
 
