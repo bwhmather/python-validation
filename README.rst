@@ -118,27 +118,6 @@ A toy example demonstrating typical usage:
         # Do something.
         ...
 
-    def function(int_arg, dict_arg, unicode_arg=None):
-        if not isinstance(int_arg, int):
-            raise TypeError()
-        if int_arg < 0:
-            raise ValueError()
-        if int_arg > 10:
-            raise ValueError()
-
-        if set(dict_arg.keys()) != {'id', 'amount'}:
-            raise ValueError()
-        if not isinstance(dict_arg['id'], int):
-            raise TypeError()
-        if dict_arg.id < 0:
-            raise ValueError()
-        if not isinstance(dict_arg['amount'], float):
-            raise TypeError()
-
-        # And so on.
-        ...
-
-
 
 The validation functions are used to check arguments passed to a public
 function.
