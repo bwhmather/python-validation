@@ -43,7 +43,8 @@ Usage
 -----
 .. begin-usage
 
-A toy example demonstrating typical usage:
+The validation functions provided by this library are intended to be used at
+the head of public functions in order to check their arguments.
 
 .. code:: python
 
