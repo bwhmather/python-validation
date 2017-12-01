@@ -16,7 +16,7 @@ if sys.version_info < (2, 7):
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.3.0',
+    version='0.4.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
