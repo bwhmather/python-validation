@@ -99,6 +99,8 @@ differ in whether they treat the keys as names or keys.
 for email addresses and domain names.
 
 Functions are fairly strict by default.
+``validate_float``, for example, will reject ``NaN`` unless explicitly allowed.
+On python 2 ``validate_text`` will normally require unicode.
 
 Intended to be mixed with normal python code to perform more complex
 validation.
