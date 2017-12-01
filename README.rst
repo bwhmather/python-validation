@@ -16,7 +16,7 @@ A simple python library containing functions that check python values.
 It is intended to make it easy to verify commonly expected pre-conditions on
 arguments to functions.
 
-Developed at `Joivy Ltd <https://joivy.com>`_ and open-sourced with permission.
+Originally developed and open-sourced at `Joivy Ltd <https://joivy.com>`_.
 
 
 Installation
