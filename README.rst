@@ -44,7 +44,7 @@ Usage
 .. begin-usage
 
 The validation functions provided by this library are intended to be used at
-the head of public functions in order to check their arguments.
+the head of public functions to check their arguments.
 
 .. code:: python
 
@@ -77,10 +77,8 @@ the head of public functions in order to check their arguments.
         ...
 
 
-The validation functions are used to check arguments passed to a public
-function.
 Exceptions raised by the validation functions are allowed to propagate through.
-No logic is run until validation is complete.
+Everything is inline, with no separate schema object or function.
 
 .. end-usage
 
