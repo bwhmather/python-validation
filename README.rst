@@ -85,6 +85,7 @@ Everything is inline, with no separate schema object or function.
 
 Design
 ------
+.. begin-design
 
 What `validation` does:
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,6 +124,8 @@ and validation pushed to the constructors.
 Finally, the ``validation`` library does not perform any kind of sanitization.
 Its purpose is to catch mistakes, not paper over them.
 Values passed in to the library will not be modified.
+
+.. end-design
 
 
 Links
