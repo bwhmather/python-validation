@@ -133,7 +133,7 @@ interface.
 
 Finally, the ``validation`` library does not perform any kind of sanitization.
 Its purpose is to catch mistakes, not paper over them.
-Values passed in to the library will not be modified.
+Values passed in to the library will never be modified.
 
 .. end-design
 
