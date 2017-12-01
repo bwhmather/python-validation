@@ -123,6 +123,14 @@ extend to handling any of the many ways to represent a sum types in json.
 More complicated data-structures should generally be represented as classes,
 and validation pushed to the constructors.
 
+Exceptions raised by the validation library are not intended to be caught.
+We assume that validation failures indicate that the caller is being used
+incorrectly and that the error and will be interpreted by a programmer and not
+the machine.
+We use built-in exception classes rather than defining custom ones so that
+libraries that use our functions can allow them to fall through their public
+interface.
+
 Finally, the ``validation`` library does not perform any kind of sanitization.
 Its purpose is to catch mistakes, not paper over them.
 Values passed in to the library will not be modified.
