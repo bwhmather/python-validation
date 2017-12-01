@@ -87,8 +87,8 @@ Design
 ------
 .. begin-design
 
-What `validation` does:
-~~~~~~~~~~~~~~~~~~~~~~~
+What `validation` does
+~~~~~~~~~~~~~~~~~~~~~~
 This library contains a number of functions that will check their first
 argument if one is provided, or return a closure that can be used later.
 
@@ -111,7 +111,7 @@ simple ``if`` block.
 Basic support for validating simple data-structures is implemented.
 
 
-What `validation` does not:
+What `validation` does not do
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The ``validation`` library is not a schema definition language.
 Validation functions and closures are not designed to be introspectable, and
