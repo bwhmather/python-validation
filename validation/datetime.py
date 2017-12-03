@@ -3,9 +3,10 @@ from __future__ import absolute_import
 from datetime import date, datetime
 
 from .core import _validate_bool
+from .common import make_optional_argument_default
 
 
-_undefined = object()
+_undefined = make_optional_argument_default()
 
 
 def _validate_date(value, required=True):

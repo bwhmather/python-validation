@@ -1,4 +1,7 @@
-_undefined = object()
+from .common import make_optional_argument_default
+
+
+_undefined = make_optional_argument_default()
 
 
 def _validate_bool(value, required=True):

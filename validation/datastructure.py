@@ -64,9 +64,10 @@ import six
 
 from .core import _validate_bool
 from .number import _validate_int
+from .common import make_optional_argument_default
 
 
-_undefined = object()
+_undefined = make_optional_argument_default()
 
 
 def _try_contextualize_exception(context):
