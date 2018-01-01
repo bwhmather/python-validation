@@ -16,7 +16,7 @@ if sys.version_info < (2, 7):
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.4.0',
+    version='0.4.1',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
@@ -41,6 +41,9 @@ setup(
         'six >= 1.10, < 2',
     ],
     tests_require=tests_require,
+    extras_require={
+        'test': tests_require,
+    },
     packages=find_packages(),
     package_data={
         '': ['*.pyi'],

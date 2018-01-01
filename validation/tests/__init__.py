@@ -1,6 +1,6 @@
 import sys
 if sys.version_info < (2, 7):  # pragma: no cover
-    import unittest2 as unittest
+    import unittest2 as unittest  # pylint: disable=import-error
 else:
     import unittest
 
@@ -17,6 +17,7 @@ from . import (
     test_mapping,
     test_structure,
     test_tuple,
+    test_optional_argument,
 )  # noqa:
 
 
@@ -34,4 +35,5 @@ suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_mapping),  # type: ignore
     loader.loadTestsFromModule(test_structure),  # type: ignore
     loader.loadTestsFromModule(test_tuple),  # type: ignore
+    loader.loadTestsFromModule(test_optional_argument),  # type: ignore
 ))
