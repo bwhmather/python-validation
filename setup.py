@@ -41,6 +41,9 @@ setup(
         'six >= 1.10, < 2',
     ],
     tests_require=tests_require,
+    extras_require={
+        'test': tests_require,
+    },
     packages=find_packages(),
     package_data={
         '': ['*.pyi'],
