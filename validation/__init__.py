@@ -21,6 +21,10 @@ from .datastructure import (
     validate_tuple,
 )
 
+from .file import (
+    validate_text_file, validate_binary_file,
+)
+
 __all__ = [
     'validate_int', 'validate_float', 'validate_bool',
     'validate_text', 'validate_bytes',
@@ -28,4 +32,5 @@ __all__ = [
     'validate_list', 'validate_set',
     'validate_mapping', 'validate_structure',
     'validate_tuple',
+    'validate_text_file', 'validate_binary_file',
 ]
