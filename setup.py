@@ -1,10 +1,16 @@
+import io
+import os
 import sys
 
 from setuptools import setup, find_packages
 
 
-with open('README.rst') as _readme_file:
-    readme = _readme_file.read()
+_readme_path = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    'README.rst',
+)
+with io.open(_readme_path, 'r', encoding='utf-8') as _readme_file:
+    _readme = _readme_file.read()
 
 
 tests_require = [
@@ -24,7 +30,7 @@ setup(
     description=(
         "A library for runtime type checking and validation of python values"
     ),
-    long_description=readme,
+    long_description=_readme,
     classifiers=[
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
