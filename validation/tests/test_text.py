@@ -51,9 +51,10 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(Exception):
             validate_text(pattern=r"(")
 
-    def test_required(self):  # type: () -> None
+    def test_not_required(self):  # type: () -> None
         validate_text(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_text(None)
 
@@ -63,13 +64,14 @@ class ValidateTextTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(u"123")
 
-    def test_repr(self):  # type: () -> None
+    def test_repr_1(self):  # type: () -> None
         validator = validate_text(pattern='hello world', required=False)
         self.assertEqual(
             repr(validator),
             'validate_text(pattern=\'hello world\', required=False)',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_text(min_length=4, max_length=10)
         self.assertEqual(
             repr(validator),
