@@ -1,17 +1,18 @@
 from typing import overload, Callable
 from datetime import date, datetime
 
+
 @overload
 def validate_date(
     value: date,
-    *, required: bool=False,
+    *, required: bool=True,
 ) -> None:
     ...
 
 
 @overload
 def validate_date(
-    *, required: bool=False,
+    *, required: bool=True,
 ) -> Callable[[date], None]:
     ...
 
@@ -19,13 +20,13 @@ def validate_date(
 @overload
 def validate_datetime(
     value: datetime,
-    *, required: bool=False,
+    *, required: bool=True,
 ) -> None:
     ...
 
 
 @overload
 def validate_datetime(
-    *, required: bool=False,
+    *, required: bool=True,
 ) -> Callable[[datetime], None]:
     ...
