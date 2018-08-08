@@ -6,16 +6,16 @@ from validation import validate_int, validate_set
 
 
 class ValidateSetTestCase(unittest.TestCase):
-    def test_empty_is_not_missing(self):
+    def test_empty_is_not_missing(self):  # type: () -> None
         validate_set(set())
 
-    def test_non_empty_no_validator(self):
+    def test_non_empty_no_validator(self):  # type: () -> None
         validate_set(set([1, 'string']))
 
-    def test_validator_valid(self):
+    def test_validator_valid(self):  # type: () -> None
         validate_set(set([1, 2, 3]), validator=validate_int())
 
-    def test_validator_invalid(self):
+    def test_validator_invalid(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_set(
                 set([1, 2, 3, -1]),
@@ -44,7 +44,7 @@ class ValidateSetTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_set(None)
 
-    def test_closure(self):
+    def test_closure(self):  # type: () -> None
         validator = validate_set(max_length=3)
         validator(set([1]))
         with self.assertRaises(ValueError):
