@@ -20,15 +20,19 @@ class ValidateBoolTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_bool("true")
 
-    def test_required(self):  # type: () -> None
+    def test_not_required(self):  # type: () -> None
         validate_bool(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_bool(None)
 
-    def test_closure(self):  # type: () -> None
+    def test_closure_valid(self):  # type: () -> None
         validator = validate_bool()
         validator(False)
+
+    def test_closure_invalid(self):
+        validator = validate_bool()
         with self.assertRaises(TypeError):
             validator(None)
 
