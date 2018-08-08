@@ -39,10 +39,8 @@ class ValidateListTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_list([1, 2, 3, 4], max_length=3)
 
-    def test_not_required(self):  # type: () -> None
+    def test_required(self):  # type: () -> None
         validate_list(None, required=False)
-
-    def test_required(self):
         with self.assertRaises(TypeError):
             validate_list(None)
 
@@ -52,14 +50,13 @@ class ValidateListTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator([1, 2, 3, 4])
 
-    def test_repr_1(self):  # type: () -> None
+    def test_repr(self):  # type: () -> None
         validator = validate_list(min_length=1, max_length=100)
         self.assertEqual(
             repr(validator),
             'validate_list(min_length=1, max_length=100)',
         )
 
-    def test_repr_2(self):  # type: () -> None
         validator = validate_list(validator=validate_int(), required=False)
         self.assertEqual(
             repr(validator),
