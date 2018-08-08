@@ -9,7 +9,7 @@ T = TypeVar('T')
 def validate_list(
     value: List[T],
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None],
+    validator: Callable[[T], None]=None,
     required: bool=True,
 ) -> None:
     ...
@@ -18,7 +18,7 @@ def validate_list(
 @overload
 def validate_list(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None],
+    validator: Callable[[T], None]=None,
     required: bool=True,
 ) -> Callable[[List[T]], None]:
     ...
@@ -28,7 +28,7 @@ def validate_list(
 def validate_set(
     value: Set[T],
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None],
+    validator: Callable[[T], None]=None,
     required: bool=True,
 ) -> None:
     ...
@@ -37,7 +37,7 @@ def validate_set(
 @overload
 def validate_set(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None],
+    validator: Callable[[T], None]=None,
     required: bool=True,
 ) -> Callable[[Set[T]], None]:
     ...
