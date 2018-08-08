@@ -28,15 +28,25 @@ def validate_date(
 
 
 @overload
-def validate_datetime(
-    value: datetime,
-    *, required: bool=True,
-) -> None:
+def validate_datetime(value: datetime) -> None:
     ...
 
 
 @overload
 def validate_datetime(
-    *, required: bool=True,
-) -> Callable[[datetime], None]:
+    value: Optional[datetime],
+    *, required: bool,
+) -> None:
+    ...
+
+
+@overload
+def validate_datetime() -> Callable[[datetime], None]:
+    ...
+
+
+@overload
+def validate_datetime(
+    *, required: bool,
+) -> Callable[[Optional[datetime]], None]:
     ...
