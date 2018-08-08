@@ -1,11 +1,19 @@
-from typing import overload, Callable
+from typing import overload, Callable, Optional
 
 
 @overload
 def validate_int(
     value: int,
     *, min_value: int=None, max_value: int=None,
-    required: bool=True,
+) -> None:
+    ...
+
+
+@overload
+def validate_int(
+    value: Optional[int],
+    *, min_value: int=None, max_value: int=None,
+    required: bool,
 ) -> None:
     ...
 
@@ -13,8 +21,15 @@ def validate_int(
 @overload
 def validate_int(
     *, min_value: int=None, max_value: int=None,
-    required: bool=True,
 ) -> Callable[[int], None]:
+    ...
+
+
+@overload
+def validate_int(
+    *, min_value: int=None, max_value: int=None,
+    required: bool,
+) -> Callable[[Optional[int]], None]:
     ...
 
 
