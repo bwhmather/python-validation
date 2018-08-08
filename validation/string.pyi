@@ -42,7 +42,15 @@ def validate_text(
 def validate_bytes(
     value: six.binary_type,
     *, min_length: int=None, max_length: int=None,
-    required: bool=True,
+) -> None:
+    ...
+
+
+@overload
+def validate_bytes(
+    value: Optional[six.binary_type],
+    *, min_length: int=None, max_length: int=None,
+    required: bool,
 ) -> None:
     ...
 
@@ -50,6 +58,13 @@ def validate_bytes(
 @overload
 def validate_bytes(
     *, min_length: int=None, max_length: int=None,
-    required: bool=True,
 ) -> Callable[[six.binary_type], None]:
+    ...
+
+
+@overload
+def validate_bytes(
+    *, min_length: int=None, max_length: int=None,
+    required: bool,
+) -> Callable[[Optional[six.binary_type]], None]:
     ...
