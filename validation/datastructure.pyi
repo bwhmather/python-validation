@@ -1,4 +1,6 @@
-from typing import Callable, List, Set, Tuple, Dict, Type, TypeVar, overload
+from typing import (
+    Callable, List, Set, Tuple, Dict, Type, TypeVar, Optional, overload,
+)
 from datetime import date, datetime
 
 
@@ -10,7 +12,16 @@ def validate_list(
     value: List[T],
     *, min_length: int=None, max_length: int=None,
     validator: Callable[[T], None]=None,
-    required: bool=True,
+) -> None:
+    ...
+
+
+@overload
+def validate_list(
+    value: Optional[List[T]],
+    *, min_length: int=None, max_length: int=None,
+    validator: Callable[[T], None]=None,
+    required: bool,
 ) -> None:
     ...
 
@@ -19,8 +30,16 @@ def validate_list(
 def validate_list(
     *, min_length: int=None, max_length: int=None,
     validator: Callable[[T], None]=None,
-    required: bool=True,
 ) -> Callable[[List[T]], None]:
+    ...
+
+
+@overload
+def validate_list(
+    *, min_length: int=None, max_length: int=None,
+    validator: Callable[[T], None]=None,
+    required: bool,
+) -> Callable[[Optional[List[T]]], None]:
     ...
 
 
