@@ -29,7 +29,22 @@ def validate_list(
 @overload
 def validate_list(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None]=None,
+) -> Callable[[List], None]:
+    ...
+
+
+@overload
+def validate_list(
+    *, min_length: int=None, max_length: int=None,
+    required: bool,
+) -> Callable[[Optional[List]], None]:
+    ...
+
+
+@overload
+def validate_list(
+    *, min_length: int=None, max_length: int=None,
+    validator: Callable[[T], None],
 ) -> Callable[[List[T]], None]:
     ...
 
@@ -37,7 +52,7 @@ def validate_list(
 @overload
 def validate_list(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None]=None,
+    validator: Callable[[T], None],
     required: bool,
 ) -> Callable[[Optional[List[T]]], None]:
     ...
