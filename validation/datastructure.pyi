@@ -65,7 +65,22 @@ def validate_set(
 @overload
 def validate_set(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None]=None,
+) -> Callable[[Set], None]:
+    ...
+
+
+@overload
+def validate_set(
+    *, min_length: int=None, max_length: int=None,
+    required: bool,
+) -> Callable[[Optional[Set]], None]:
+    ...
+
+
+@overload
+def validate_set(
+    *, min_length: int=None, max_length: int=None,
+    validator: Callable[[T], None],
 ) -> Callable[[Set[T]], None]:
     ...
 
@@ -73,7 +88,7 @@ def validate_set(
 @overload
 def validate_set(
     *, min_length: int=None, max_length: int=None,
-    validator: Callable[[T], None]=None,
+    validator: Callable[[T], None],
     required: bool,
 ) -> Callable[[Optional[Set[T]]], None]:
     ...
