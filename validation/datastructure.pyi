@@ -196,7 +196,16 @@ def validate_structure(
     value: Dict,
     *, allow_extra: bool=False,
     schema: Dict=None,
-    required: bool=False,
+) -> None:
+    ...
+
+
+@overload
+def validate_structure(
+    value: Optional[Dict],
+    *, allow_extra: bool=False,
+    schema: Dict=None,
+    required: bool,
 ) -> None:
     ...
 
@@ -205,8 +214,16 @@ def validate_structure(
 def validate_structure(
     *, allow_extra: bool=False,
     schema: Dict=None,
-    required: bool=False,
-) -> Callable[[Tuple], None]:
+) -> Callable[[Dict], None]:
+    ...
+
+
+@overload
+def validate_structure(
+    *, allow_extra: bool=False,
+    schema: Dict=None,
+    required: bool,
+) -> Callable[[Optional[Dict]], None]:
     ...
 
 
