@@ -6,7 +6,7 @@ from validation import validate_int, validate_text, validate_tuple
 
 
 class ValidateTupleTestCase(unittest.TestCase):
-    def test_basic_valid(self):
+    def test_basic_valid(self):  # type: () -> None
         validate_tuple((1, 'string'))
 
     def test_required(self):
@@ -23,7 +23,7 @@ class ValidateTupleTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_tuple(schema=(validate_int(),), length=1)
 
-    def test_schema_valid(self):
+    def test_schema_valid(self):  # type: () -> None
         validator = validate_tuple(schema=(
             validate_text(), validate_int(),
         ))
@@ -38,7 +38,7 @@ class ValidateTupleTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator((u"string", '1000'))
 
-    def test_schema_invalid_value(self):
+    def test_schema_invalid_value(self):  # type: () -> None
         validator = validate_tuple(schema=(
             validate_text(), validate_int(min_value=0),
         ))
@@ -46,7 +46,7 @@ class ValidateTupleTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator((u"string", -1))
 
-    def test_schema_positional_argument(self):
+    def test_schema_positional_argument(self):  # type: () -> None
         def validator(*args):
             assert len(args) == 1
 
@@ -76,7 +76,7 @@ class ValidateTupleTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validator((1,))
 
-    def test_length_just_right(self):
+    def test_length_just_right(self):  # type: () -> None
         validator = validate_tuple(length=2)
         validator((1, 2))
 
