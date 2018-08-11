@@ -133,9 +133,28 @@ def validate_mapping(
 
 
 @overload
+def validate_mapping() -> Callable[[Dict[object, object]], None]:
+    ...
+
+
+@overload
 def validate_mapping(
-    *, key_validator: Callable[[K], None]=None,
-    value_validator: Callable[[V], None]=None,
+    *, key_validator: Callable[[K], None],
+) -> Callable[[Dict[K, object]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, value_validator: Callable[[V], None],
+) -> Callable[[Dict[object, V]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, key_validator: Callable[[K], None],
+    value_validator: Callable[[V], None],
 ) -> Callable[[Dict[K, V]], None]:
     ...
 
@@ -143,8 +162,31 @@ def validate_mapping(
 @overload
 def validate_mapping(
     *, required: bool,
-    key_validator: Callable[[K], None]=None,
-    value_validator: Callable[[V], None]=None,
+) -> Callable[[Optional[Dict[object, object]]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, required: bool,
+    key_validator: Callable[[K], None],
+) -> Callable[[Optional[Dict[K, object]]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, required: bool,
+    value_validator: Callable[[V], None],
+) -> Callable[[Optional[Dict[object, V]]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, required: bool,
+    key_validator: Callable[[K], None],
+    value_validator: Callable[[V], None],
 ) -> Callable[[Optional[Dict[K, V]]], None]:
     ...
 
