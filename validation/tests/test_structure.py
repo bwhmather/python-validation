@@ -9,9 +9,10 @@ class ValidateStructureTestCase(unittest.TestCase):
     def test_basic_valid(self):  # type: () -> None
         validate_structure({'hello': "world"})
 
-    def test_required(self):
+    def test_not_required(self):  # type: () -> None
         validate_structure(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_structure(None)
 
@@ -86,13 +87,14 @@ class ValidateStructureTestCase(unittest.TestCase):
             'unexpected': 2,
         })
 
-    def test_repr(self):
+    def test_repr_1(self):  # type: () -> None
         validator = validate_structure(schema={'key': validate_int()})
         self.assertEqual(
             repr(validator),
             'validate_structure(schema={\'key\': validate_int()})',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_structure(allow_extra=True, required=False)
         self.assertEqual(
             repr(validator),
