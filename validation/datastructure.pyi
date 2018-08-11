@@ -230,7 +230,16 @@ def validate_structure(
 @overload
 def validate_tuple(
     value: Tuple,
-    *, required: bool=False,
+    *, schema: Tuple=None,
+    length: int=None,
+) -> None:
+    ...
+
+
+@overload
+def validate_tuple(
+    value: Optional[Tuple],
+    *, required: bool,
     schema: Tuple=None,
     length: int=None,
 ) -> None:
@@ -239,8 +248,15 @@ def validate_tuple(
 
 @overload
 def validate_tuple(
-    *, required: bool=False,
-    schema: Tuple=None,
+    *, schema: Tuple=None,
     length: int=None,
 ) -> Callable[[Tuple], None]:
+    ...
+
+@overload
+def validate_tuple(
+    *, required: bool,
+    schema: Tuple=None,
+    length: int=None,
+) -> Callable[[Optional[Tuple]], None]:
     ...
