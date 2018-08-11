@@ -116,7 +116,16 @@ V = TypeVar('V')
 @overload
 def validate_mapping(
     value: Dict[K, V],
-    *, required: bool=False,
+    *, key_validator: Callable[[K], None]=None,
+    value_validator: Callable[[V], None]=None,
+) -> None:
+    ...
+
+
+@overload
+def validate_mapping(
+    value: Optional[Dict[K, V]],
+    *, required: bool,
     key_validator: Callable[[K], None]=None,
     value_validator: Callable[[V], None]=None,
 ) -> None:
@@ -125,10 +134,18 @@ def validate_mapping(
 
 @overload
 def validate_mapping(
-    *, required: bool=False,
-    key_validator: Callable[[K], None]=None,
+    *, key_validator: Callable[[K], None]=None,
     value_validator: Callable[[V], None]=None,
 ) -> Callable[[Dict[K, V]], None]:
+    ...
+
+
+@overload
+def validate_mapping(
+    *, required: bool,
+    key_validator: Callable[[K], None]=None,
+    value_validator: Callable[[V], None]=None,
+) -> Callable[[Optional[Dict[K, V]]], None]:
     ...
 
 
