@@ -91,9 +91,10 @@ class ValidateFloatTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_float(5.0, max_value=4.5)
 
-    def test_required(self):  # type: () -> None
+    def test_not_required(self):  # type: () -> None
         validate_float(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_float(None)
 
@@ -102,7 +103,7 @@ class ValidateFloatTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validator(-1.0)
 
-    def test_repr(self):  # type: () -> None
+    def test_repr_1(self):  # type: () -> None
         validator = validate_float(
             min_value=1.0, max_value=1.0, required=False,
         )
@@ -111,6 +112,7 @@ class ValidateFloatTestCase(unittest.TestCase):
             'validate_float(min_value=1.0, max_value=1.0, required=False)',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_float(allow_infinite=True, allow_nan=True)
         self.assertEqual(
             repr(validator),

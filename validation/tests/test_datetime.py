@@ -24,15 +24,19 @@ class ValidateDateTimeTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_datetime("1970-01-01T12:00:00+00:00")
 
-    def test_required(self):  # type: () -> None
+    def test_not_required(self):  # type: () -> None
         validate_datetime(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_datetime(None)
 
-    def test_closure(self):
+    def test_closure_valid(self):  # type: () -> None
         validator = validate_datetime()
         validator(datetime.now(pytz.utc))
+
+    def test_closure_date(self):
+        validator = validate_datetime()
         with self.assertRaises(TypeError):
             validator(date.today())
 
