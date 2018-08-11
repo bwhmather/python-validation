@@ -13,7 +13,7 @@ install:
   - "pip install pycodestyle"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pyflakes; fi"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pylint; fi"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then pip install sphinx; fi"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.7' ]; then pip install sphinx; fi"
 
 script:
   - "coverage run --source=validation setup.py test"
@@ -25,7 +25,7 @@ after_success:
   - "coveralls"
 
 before_deploy:
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then make -C docs html; fi"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.7' ]; then make -C docs html; fi"
 
 deploy:
   - provider: pages
@@ -35,7 +35,7 @@ deploy:
     github_token: "$GITHUB_TOKEN"
     on:
       branch: "master"
-      condition: "\"${TRAVIS_PYTHON_VERSION}\" = '3.6'"
+      condition: "\"${TRAVIS_PYTHON_VERSION}\" = '3.7'"
   - provider: pypi
     distributions: "sdist --formats=zip"
     user: "bwhmather-travis"
@@ -43,4 +43,4 @@ deploy:
       secure: "rLlDjRwGY41G4DGU3g54RRkigMRHlFkffckVL+UpgRLaIWbTvvMfwDZvViMNsABxKS9Mwgf/D3Xls+DvimMY5is9l2bMQsW9MgQN+icnZFGgY+dnQD9ylSWcxn5U+/P0BTz1WIY4cA41Rjqv0aE23FKwkUYgfkdvYz51IrcvMbrvoo7LgTAPgF43r1LJAysv5A0Q4xdiKrl3d/9KfiDAS9PA6CXWMj7EXNzoUEl8UoycUwKsTx7hHthmsQrHIBPb7oB0xuKo5UtCYHlAXvIfD7VCbg4O5kLVb/f4m+Uo0eRpLw3RMtV/VJ/jK6UROZgixSP0Dryg9uP9/S3Ei/XgWnpWX4JRQ9ZQZW3tvo6YvQL/uVwsOpvbwhTJuIh+HUHGyVUwZvMsL2x53qnroJHffhvdnKji5p8ITJW6YPFovoZMktl9PLr/4ZprmY/pYFdJKMjOJuOpRTBctAmVX3d20oR9TWsliHb4D2CDOukmWT1iw9ogJwIDsGxqHt5GC/Rfe6Zb7k+GogMASXwGmw/D1n2SKbayryC+ngWoR7TEFdG78K0vCciu8Faq+sOeb8NCJl/cxBiOPvwD3LDnH5OSB/HM4sGF9pU2XnTUv41osP1wsPUCB7t61vj+J4sV0pgfvFHKzRkgZV5qCwbxq0DyFgmJqESPjs7WLQAI2sU3MHA="
     on:
       branch: "master"
-      condition: "\"${TRAVIS_PYTHON_VERSION}\" = '3.6'"
+      condition: "\"${TRAVIS_PYTHON_VERSION}\" = '3.7'"
