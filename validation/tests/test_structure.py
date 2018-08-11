@@ -6,7 +6,7 @@ from validation import validate_int, validate_text, validate_structure
 
 
 class ValidateStructureTestCase(unittest.TestCase):
-    def test_basic_valid(self):
+    def test_basic_valid(self):  # type: () -> None
         validate_structure({'hello': "world"})
 
     def test_required(self):
@@ -19,7 +19,7 @@ class ValidateStructureTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_structure([])
 
-    def test_schema_valid(self):
+    def test_schema_valid(self):  # type: () -> None
         validator = validate_structure(schema={
             'hello': validate_text(),
             'count': validate_int(),
@@ -39,7 +39,7 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'count': "one hundred",
             })
 
-    def test_schema_invalid_value(self):
+    def test_schema_invalid_value(self):  # type: () -> None
         validator = validate_structure(schema={
             'hello': validate_text(),
             'count': validate_int(min_value=0),
@@ -51,13 +51,13 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'count': -1,
             })
 
-    def test_schema_positional_argument(self):
+    def test_schema_positional_argument(self):  # type: () -> None
         def validator(*args):
             assert len(args) == 1
 
         validate_structure({"key": "value"}, schema={"key": validator})
 
-    def test_schema_unexpected_key(self):
+    def test_schema_unexpected_key(self):  # type: () -> None
         validator = validate_structure(schema={
             'expected': validate_int(),
         })
@@ -68,7 +68,7 @@ class ValidateStructureTestCase(unittest.TestCase):
                 'unexpected': 2,
             })
 
-    def test_schema_missing_key(self):
+    def test_schema_missing_key(self):  # type: () -> None
         validator = validate_structure(schema={
             'expected': validate_int(),
         })
@@ -76,7 +76,7 @@ class ValidateStructureTestCase(unittest.TestCase):
         with self.assertRaises(KeyError):
             validator({})
 
-    def test_schema_allow_extra(self):
+    def test_schema_allow_extra(self):  # type: () -> None
         validator = validate_structure(schema={
             'expected': validate_int(),
         }, allow_extra=True)
