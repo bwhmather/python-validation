@@ -6,16 +6,16 @@ from validation import validate_int, validate_list
 
 
 class ValidateListTestCase(unittest.TestCase):
-    def test_empty_is_not_missing(self):
+    def test_empty_is_not_missing(self):  # type: () -> None
         validate_list([])
 
-    def test_non_empty_no_validator(self):
+    def test_non_empty_no_validator(self):  # type: () -> None
         validate_list([1, 'string'])
 
-    def test_validator_valid(self):
+    def test_validator_valid(self):  # type: () -> None
         validate_list([1, 2, 3], validator=validate_int())
 
-    def test_validator_invalid(self):
+    def test_validator_invalid(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_list([1, 2, 3, -1], validator=validate_int(min_value=0))
 
@@ -27,37 +27,39 @@ class ValidateListTestCase(unittest.TestCase):
         with self.assertRaises(TypeError):
             validate_list(iter([1]), validator=validate_int())
 
-    def test_min_len(self):
+    def test_min_len(self):  # type: () -> None
         validate_list([1, 2, 3], min_length=3)
 
         with self.assertRaises(ValueError):
             validate_list([1, 2, 3], min_length=4)
 
-    def test_max_len(self):
+    def test_max_len(self):  # type: () -> None
         validate_list([1, 2, 3], max_length=3)
 
         with self.assertRaises(ValueError):
             validate_list([1, 2, 3, 4], max_length=3)
 
-    def test_required(self):
+    def test_not_required(self):  # type: () -> None
         validate_list(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_list(None)
 
-    def test_closure(self):
+    def test_closure(self):  # type: () -> None
         validator = validate_list(max_length=3)
         validator([1])
         with self.assertRaises(ValueError):
             validator([1, 2, 3, 4])
 
-    def test_repr(self):
+    def test_repr_1(self):  # type: () -> None
         validator = validate_list(min_length=1, max_length=100)
         self.assertEqual(
             repr(validator),
             'validate_list(min_length=1, max_length=100)',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_list(validator=validate_int(), required=False)
         self.assertEqual(
             repr(validator),

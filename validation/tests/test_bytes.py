@@ -25,9 +25,10 @@ class ValidateBytesTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_bytes(b"123456", max_length=5)
 
-    def test_required(self):  # type: () -> None
+    def test_not_required(self):  # type: () -> None
         validate_bytes(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_bytes(None)
 
