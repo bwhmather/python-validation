@@ -65,19 +65,23 @@ class ValidateMappingTestCase(unittest.TestCase):
                 (u"key2", 2),
             ])
 
-    def test_required(self):
+    def test_not_required(self):  # type: () -> None
         validate_mapping(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_mapping(None)
 
-    def test_closure(self):
+    def test_closure_valid(self):  # type: () -> None
         validator = validate_mapping(key_validator=validate_int())
         validator({1: 2})
+
+    def test_closure_invalid(self):
+        validator = validate_mapping(key_validator=validate_int())
         with self.assertRaises(TypeError):
             validator({"1": 1})
 
-    def test_repr(self):
+    def test_repr_1(self):  # type: () -> None
         validator = validate_mapping(
             key_validator=validate_text(), value_validator=validate_int(),
         )
@@ -88,6 +92,7 @@ class ValidateMappingTestCase(unittest.TestCase):
             ')',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_mapping(required=False)
         self.assertEqual(
             repr(validator),
