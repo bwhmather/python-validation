@@ -9,9 +9,10 @@ class ValidateTupleTestCase(unittest.TestCase):
     def test_basic_valid(self):  # type: () -> None
         validate_tuple((1, 'string'))
 
-    def test_required(self):
+    def test_not_required(self):  # type: () -> None
         validate_tuple(None, required=False)
 
+    def test_required(self):
         with self.assertRaises(TypeError):
             validate_tuple(None)
 
@@ -80,13 +81,14 @@ class ValidateTupleTestCase(unittest.TestCase):
         validator = validate_tuple(length=2)
         validator((1, 2))
 
-    def test_repr(self):
+    def test_repr_1(self):  # type: () -> None
         validator = validate_tuple(schema=(validate_int(),))
         self.assertEqual(
             repr(validator),
             'validate_tuple(schema=(validate_int(),))',
         )
 
+    def test_repr_2(self):  # type: () -> None
         validator = validate_tuple(length=2, required=False)
         self.assertEqual(
             repr(validator),
