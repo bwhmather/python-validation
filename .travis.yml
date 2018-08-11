@@ -10,15 +10,15 @@ python:
 install:
   - "pip install -e .[test]"
   - "pip install coveralls"
-  - "pip install pyflakes"
   - "pip install pycodestyle"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pyflakes; fi"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pylint; fi"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then pip install sphinx; fi"
 
 script:
   - "coverage run --source=validation setup.py test"
   - "pycodestyle validation setup.py"
-  - "pyflakes validation setup.py"
+  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pyflakes validation setup.py; fi"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pylint -E validation setup.py; fi"
 
 after_success:
