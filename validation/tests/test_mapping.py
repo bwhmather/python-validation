@@ -6,13 +6,13 @@ from validation import validate_int, validate_text, validate_mapping
 
 
 class ValidateMappingTestCase(unittest.TestCase):
-    def test_basic_valid(self):
+    def test_basic_valid(self):  # type: () -> None
         validate_mapping({
             "key1": 1,
             "key2": 2,
         })
 
-    def test_valid_keys(self):
+    def test_valid_keys(self):  # type: () -> None
         validate_mapping({
             u"key1": 1,
             u"key2": 2,
@@ -25,14 +25,14 @@ class ValidateMappingTestCase(unittest.TestCase):
                 u"key2": 2,
             }, key_validator=validate_int())
 
-    def test_invalid_key(self):
+    def test_invalid_key(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_mapping({
                 u"key1": 1,
                 u"key2": 2,
             }, key_validator=validate_text(min_length=20))
 
-    def test_key_validator_positional_argument(self):
+    def test_key_validator_positional_argument(self):  # type: () -> None
         def validator(*args):
             assert len(args) == 1
 
@@ -45,14 +45,14 @@ class ValidateMappingTestCase(unittest.TestCase):
                 u"key2": "2",
             }, value_validator=validate_int())
 
-    def test_invalid_value(self):
+    def test_invalid_value(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_mapping({
                 u"key1": 1,
                 u"key2": 2,
             }, value_validator=validate_int(max_value=1))
 
-    def test_value_validator_positional_argument(self):
+    def test_value_validator_positional_argument(self):  # type: () -> None
         def validator(*args):
             assert len(args) == 1
 
