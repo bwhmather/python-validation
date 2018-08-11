@@ -13,7 +13,7 @@ class ValidateIntTestCase(unittest.TestCase):
         validate_int(0)
         validate_int(1)
 
-    def test_long(self):
+    def test_long(self):  # pragma: no cover
         if six.PY3:
             raise unittest.SkipTest("not relevant in python3")
 
