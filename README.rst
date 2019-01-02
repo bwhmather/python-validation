@@ -12,7 +12,7 @@ Python Validation
 
 .. begin-docs
 
-A simple python library containing functions that check python values.
+A simple Python library containing functions that check Python values.
 It is intended to make it easy to verify commonly expected pre-conditions on
 arguments to functions.
 
@@ -32,9 +32,9 @@ It can be installed manually using pip.
     $ pip install validation
 
 As this library is a useful tool for cleaning up established codebases, it will
-continue to support python 2.6 and 2.7 for the foreseeable future.
+continue to support Python 2.7 for the foreseeable future.
 The string validation functions are particularly handy for sorting out unicode
-issues in preparation for making the jump to python 3.
+issues in preparation for making the jump to Python 3.
 
 .. end-installation
 
@@ -100,9 +100,9 @@ for email addresses and domain names.
 
 Functions are fairly strict by default.
 ``validate_float``, for example, will reject ``NaN`` unless explicitly allowed.
-On python 2 ``validate_text`` will enforce the use of unicode.
+On Python 2 ``validate_text`` will enforce the use of unicode.
 
-Intended to be mixed with normal python code to perform more complex
+Intended to be mixed with normal Python code to perform more complex
 validation.
 As an example, the library provides no tools to assert that to values are
 mutually exclusive as this requirement is much more clearly expressed with a
