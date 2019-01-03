@@ -1,0 +1,380 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>validation.number &#8212; Validation 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for validation.number</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">.core</span> <span class="k">import</span> <span class="n">_validate_bool</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="k">import</span> <span class="n">make_optional_argument_default</span>
+
+
+<span class="n">_undefined</span> <span class="o">=</span> <span class="n">make_optional_argument_default</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_int</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">integer_types</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;int&#39;, but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">min_value</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected value less than </span><span class="si">{min}</span><span class="s2">, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="n">min_value</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">max_value</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected value greater than </span><span class="si">{max}</span><span class="s2">, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_value</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">_int_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">min_value</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">max_value</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+            <span class="n">min_value</span> <span class="o">&gt;</span> <span class="n">max_value</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s1">&#39;minimum value </span><span class="si">{min!r}</span><span class="s1"> is greater than maximum value </span><span class="si">{max!r}</span><span class="s1">&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_int</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;min_value=</span><span class="si">{min_value!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">min_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;max_value=</span><span class="si">{max_value!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">max_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_int(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_int"><a class="viewcode-back" href="../../reference.html#validation.number.validate_int">[docs]</a><span class="k">def</span> <span class="nf">validate_int</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">min_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks that the target value is a valid integer, and that it fits in the</span>
+<span class="sd">    requested bounds.</span>
+
+<span class="sd">    Does not accept integer values encoded as ``floats``.</span>
+<span class="sd">    Adding a value to a ``float`` will result in a loss of precision if the</span>
+<span class="sd">    total is greater than ``2**53``.</span>
+<span class="sd">    The division operator also behaves differently in python 2.</span>
+
+<span class="sd">    :param int value:</span>
+<span class="sd">        The number to be validated.</span>
+<span class="sd">    :param int min_value:</span>
+<span class="sd">        The minimum acceptable value for the number.</span>
+<span class="sd">    :param int max_value:</span>
+<span class="sd">        The maximum acceptable value for the number.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can be `None`.  Defaults to `True`.</span>
+
+<span class="sd">    :raises TypeError:</span>
+<span class="sd">        If the value is not an integer, or if it was marked as `required` but</span>
+<span class="sd">        `None` was passed in.</span>
+<span class="sd">    :raises ValueError:</span>
+<span class="sd">        If the value is not within bounds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_int_validator</span><span class="p">(</span>
+        <span class="n">min_value</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="n">max_value</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_float</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">min_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_infinite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;float&#39;, but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_infinite</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected finite value, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_nan</span> <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+             <span class="s2">&quot;expected valid float, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="n">min_value</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected value less than </span><span class="si">{min}</span><span class="s2">, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="n">min_value</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">max_value</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected value greater than </span><span class="si">{max}</span><span class="s2">, but got </span><span class="si">{value}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_value</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">_float_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">,</span>
+        <span class="n">allow_infinite</span><span class="p">,</span> <span class="n">allow_nan</span><span class="p">,</span>
+        <span class="n">required</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">_validate_float</span><span class="p">(</span>
+            <span class="n">min_value</span><span class="p">,</span> <span class="n">allow_infinite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">_validate_float</span><span class="p">(</span>
+            <span class="n">max_value</span><span class="p">,</span> <span class="n">allow_infinite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+            <span class="n">min_value</span> <span class="o">&gt;</span> <span class="n">max_value</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s1">&#39;minimum value </span><span class="si">{min!r}</span><span class="s1"> is greater than maximum value </span><span class="si">{max!r}</span><span class="s1">&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span> <span class="o">=</span> <span class="n">min_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">allow_infinite</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_infinite</span> <span class="o">=</span> <span class="n">allow_infinite</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">allow_nan</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_nan</span> <span class="o">=</span> <span class="n">allow_nan</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_float</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span><span class="p">,</span>
+            <span class="n">allow_infinite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_infinite</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_nan</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;min_value=</span><span class="si">{min_value!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">min_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_value</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;max_value=</span><span class="si">{max_value!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">max_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_value</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_infinite</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;allow_infinite=</span><span class="si">{allow_infinite!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">allow_infinite</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_infinite</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_nan</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;allow_nan=</span><span class="si">{allow_nan!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">allow_nan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_nan</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_float(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_float"><a class="viewcode-back" href="../../reference.html#validation.number.validate_float">[docs]</a><span class="k">def</span> <span class="nf">validate_float</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">min_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">allow_infinite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks that the target value is a valid floating point number and that it</span>
+<span class="sd">    fits in the requested bounds.</span>
+
+<span class="sd">    :param int value:</span>
+<span class="sd">        The number to be validated.</span>
+<span class="sd">    :param int min_value:</span>
+<span class="sd">        The minimum acceptable value for the number.</span>
+<span class="sd">    :param int max_value:</span>
+<span class="sd">        The maximum acceptable value for the number.</span>
+<span class="sd">    :param bool allow_infinite:</span>
+<span class="sd">        Whether or not to accept positive or negative infinities.  Defaults to</span>
+<span class="sd">        ``False``.</span>
+<span class="sd">    :param bool allow_nan:</span>
+<span class="sd">        Whether or not to accept NaNs.  Defaults to ``False``.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can be ``None``.  Defaults to ``True``.</span>
+
+<span class="sd">    :raises TypeError:</span>
+<span class="sd">        If the value is not an integer, or if it was marked as ``required`` but</span>
+<span class="sd">        ``None`` was passed in.</span>
+<span class="sd">    :raises ValueError:</span>
+<span class="sd">        If the value is not within bounds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_float_validator</span><span class="p">(</span>
+        <span class="n">min_value</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="n">max_value</span><span class="p">,</span>
+        <span class="n">allow_infinite</span><span class="o">=</span><span class="n">allow_infinite</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="n">allow_nan</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Validation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design.html">Design</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ben Mather <bwhmather@bwhmather.com>.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

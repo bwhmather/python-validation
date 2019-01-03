@@ -1,0 +1,545 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Reference &#8212; Validation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Design" href="design.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="reference">
+<span id="id1"></span><h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="core-validation-functions">
+<h2>Core Validation Functions<a class="headerlink" href="#core-validation-functions" title="Permalink to this headline">¶</a></h2>
+<p>Functions for validating simple, immutable, built-in data-types.</p>
+<div class="section" id="module-validation.number">
+<span id="numbers"></span><h3>Numbers<a class="headerlink" href="#module-validation.number" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.number.validate_int">
+<code class="descclassname">validation.number.</code><code class="descname">validate_int</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>min_value=None</em>, <em>max_value=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/number.html#validate_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.number.validate_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the target value is a valid integer, and that it fits in the
+requested bounds.</p>
+<p>Does not accept integer values encoded as <code class="docutils literal notranslate"><span class="pre">floats</span></code>.
+Adding a value to a <code class="docutils literal notranslate"><span class="pre">float</span></code> will result in a loss of precision if the
+total is greater than <code class="docutils literal notranslate"><span class="pre">2**53</span></code>.
+The division operator also behaves differently in python 2.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>int</em>) – The number to be validated.</li>
+<li><strong>min_value</strong> (<em>int</em>) – The minimum acceptable value for the number.</li>
+<li><strong>max_value</strong> (<em>int</em>) – The maximum acceptable value for the number.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TypeError</strong> – If the value is not an integer, or if it was marked as <cite>required</cite> but
+<cite>None</cite> was passed in.</li>
+<li><strong>ValueError</strong> – If the value is not within bounds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.number.validate_float">
+<code class="descclassname">validation.number.</code><code class="descname">validate_float</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>min_value=None</em>, <em>max_value=None</em>, <em>allow_infinite=False</em>, <em>allow_nan=False</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/number.html#validate_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.number.validate_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the target value is a valid floating point number and that it
+fits in the requested bounds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>int</em>) – The number to be validated.</li>
+<li><strong>min_value</strong> (<em>int</em>) – The minimum acceptable value for the number.</li>
+<li><strong>max_value</strong> (<em>int</em>) – The maximum acceptable value for the number.</li>
+<li><strong>allow_infinite</strong> (<em>bool</em>) – Whether or not to accept positive or negative infinities.  Defaults to
+<code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+<li><strong>allow_nan</strong> (<em>bool</em>) – Whether or not to accept NaNs.  Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <code class="docutils literal notranslate"><span class="pre">None</span></code>.  Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TypeError</strong> – If the value is not an integer, or if it was marked as <code class="docutils literal notranslate"><span class="pre">required</span></code> but
+<code class="docutils literal notranslate"><span class="pre">None</span></code> was passed in.</li>
+<li><strong>ValueError</strong> – If the value is not within bounds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-validation.string">
+<span id="strings"></span><h3>Strings<a class="headerlink" href="#module-validation.string" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.string.validate_text">
+<code class="descclassname">validation.string.</code><code class="descname">validate_text</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>min_length=None</em>, <em>max_length=None</em>, <em>pattern=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/string.html#validate_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.string.validate_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the target value is a valid human readable string value.</p>
+<p>In python 2 this will strictly enforce the use of <code class="docutils literal notranslate"><span class="pre">unicode</span></code>.
+<code class="docutils literal notranslate"><span class="pre">str``s</span> <span class="pre">are</span> <span class="pre">not</span> <span class="pre">accepted</span> <span class="pre">as</span> <span class="pre">there</span> <span class="pre">is</span> <span class="pre">no</span> <span class="pre">way</span> <span class="pre">to</span> <span class="pre">tell</span> <span class="pre">if</span> <span class="pre">they</span> <span class="pre">are</span> <span class="pre">the</span>
+<span class="pre">result</span> <span class="pre">of</span> <span class="pre">decoding</span> <span class="pre">a</span> <span class="pre">byte-string</span> <span class="pre">containing</span> <span class="pre">only</span> <span class="pre">``latin-1</span></code> characters
+or if they are still encoded.  In python 3 things are much simpler.</p>
+<p>Patterns are python regular expressions and must match the entire string.</p>
+<p>A simple example that uses the pattern parameter to validate a string
+describing a date:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="n">validate_text</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="s1">&#39;[0-9]</span><span class="si">{4}</span><span class="s1">-[0-9]</span><span class="si">{2}</span><span class="s1">-[0-9]</span><span class="si">{2}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Do something</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>unicode</em>) – The string to be validated.</li>
+<li><strong>min_length</strong> (<em>int</em>) – The minimum length of the string.</li>
+<li><strong>max_length</strong> (<em>int</em>) – The maximum acceptable length for the string.  By default, the length
+is not checked.</li>
+<li><strong>pattern</strong> (<em>str|re.Pattern</em>) – Regular expression to check the value against.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TypeError</strong> – If the value is not a unicode string , or if it was marked as
+<cite>required</cite> but <cite>None</cite> was passed in.</li>
+<li><strong>ValueError</strong> – If the value was longer or shorter than expected, or did not match
+the pattern.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.string.validate_bytes">
+<code class="descclassname">validation.string.</code><code class="descname">validate_bytes</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>min_length=None</em>, <em>max_length=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/string.html#validate_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.string.validate_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the supplied value is a valid byte-string.</p>
+<p>In python 3 will accepts <cite>bytes</cite>, in python 2 <cite>str</cite>.</p>
+<p>Should not be used for validating human readable strings,  Please use
+<a class="reference internal" href="#validation.string.validate_text" title="validation.string.validate_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_text()</span></code></a> instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>bytes</em>) – The string to be validated.</li>
+<li><strong>min_length</strong> (<em>int</em>) – The minimum length of the string.</li>
+<li><strong>max_length</strong> (<em>int</em>) – The maximum acceptable length for the string.  By default, the length
+is not checked.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TypeError</strong> – If the value is not a byte-string, or if it was marked as <cite>required</cite>
+but <cite>None</cite> was passed in.</li>
+<li><strong>ValueError</strong> – If the value was longer or shorter than expected.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-validation.datetime">
+<span id="time"></span><h3>Time<a class="headerlink" href="#module-validation.datetime" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.datetime.validate_date">
+<code class="descclassname">validation.datetime.</code><code class="descname">validate_date</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datetime.html#validate_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datetime.validate_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the value is a valid <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code> value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>datetime.date</em>) – The value to be validated.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>TypeError</strong> – If the value is not a date, or if it was marked as <cite>required</cite> but
+None was passed in.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.datetime.validate_datetime">
+<code class="descclassname">validation.datetime.</code><code class="descname">validate_datetime</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datetime.html#validate_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datetime.validate_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the value is a valid <code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code> value.</p>
+<p>The value must have a valid timezone to be accepted.  Naive <cite>datetime</cite>
+objects are not allowed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> (<em>datetime.date</em>) – The value to be validated.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><strong>TypeError</strong> – If the value is not a datetime, or if it was marked as <cite>required</cite> but
+None was passed in.</li>
+<li><strong>ValueError</strong> – If the value does not have a valid timezone.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-validation.core">
+<span id="other"></span><h3>Other<a class="headerlink" href="#module-validation.core" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.core.validate_bool">
+<code class="descclassname">validation.core.</code><code class="descname">validate_bool</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/core.html#validate_bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.core.validate_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the target value is a valid boolean.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> – The value to be validated.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><strong>TypeError</strong> – If the value is not a boolean, or if it was marked as <cite>required</cite> but
+<cite>None</cite> was passed in.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-validation.datastructure">
+<span id="datastructure-validation-functions"></span><h2>Datastructure Validation Functions<a class="headerlink" href="#module-validation.datastructure" title="Permalink to this headline">¶</a></h2>
+<p>This module contains functions for validating plain data-structures.</p>
+<p>These functions typically expect to be passed another validator function for
+one or more of their arguments, that will be used to check every entry, key or
+value that that the data-structure contains.
+All validator functions in this library, when called with no value argument,
+will return a closure that is intended to be used in this context.</p>
+<p>As an example, to check that a list contains only positive integers, you can
+call <a class="reference internal" href="#validation.number.validate_int" title="validation.number.validate_int"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_int()</span></code></a> with <code class="docutils literal notranslate"><span class="pre">min_value</span></code> equal to zero
+to create a closure that will check for positive integers, and pass it as the
+<code class="docutils literal notranslate"><span class="pre">validator</span></code> argument to <a class="reference internal" href="#validation.datastructure.validate_list" title="validation.datastructure.validate_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_list()</span></code></a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">validation</span> <span class="k">import</span> <span class="n">validate_int</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">validate_list</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="n">validate_int</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">invalid item at position 3:  expected value less than 0, but got -1</span>
+</pre></div>
+</div>
+<p>Note that the exception raised here is not the exception that was raised by
+<a class="reference internal" href="#validation.number.validate_int" title="validation.number.validate_int"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_int()</span></code></a>.
+For the subset of built-in exceptions that can be raised, in normal usage, by
+validators in this library - namely <code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code>, <code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code>,
+<code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyError</span></code>, <code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code> and <code class="xref py py-exc docutils literal notranslate"><span class="pre">AssertionError</span></code> - we will attempt
+to create and raise a copy of the original with additional context information
+added to the message.
+The other built-in exceptions don’t make sense as validation errors and so we
+don’t try to catch them.
+There doesn’t appear to be a safe way to extend custom exceptions so these are
+also left alone.</p>
+<p>There is no single <code class="docutils literal notranslate"><span class="pre">validate_dict</span></code> function.
+Dictionaries can be validated either as a mapping, that maps between keys of
+one type and values of another, using <a class="reference internal" href="#validation.datastructure.validate_mapping" title="validation.datastructure.validate_mapping"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_mapping()</span></code></a>, or as struct
+like objects, that map predefined keys to values with key specific types, using
+<a class="reference internal" href="#validation.datastructure.validate_structure" title="validation.datastructure.validate_structure"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_structure()</span></code></a>.</p>
+<p>The relationship between <a class="reference internal" href="#validation.datastructure.validate_list" title="validation.datastructure.validate_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_list()</span></code></a> and <a class="reference internal" href="#validation.datastructure.validate_tuple" title="validation.datastructure.validate_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_tuple()</span></code></a> is
+similar.  <a class="reference internal" href="#validation.datastructure.validate_list" title="validation.datastructure.validate_list"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_list()</span></code></a> expects the list to be homogeneous, while
+<a class="reference internal" href="#validation.datastructure.validate_tuple" title="validation.datastructure.validate_tuple"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_tuple()</span></code></a> will check each entry with its own validation function.</p>
+<div class="section" id="sequences">
+<h3>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.datastructure.validate_list">
+<code class="descclassname">validation.datastructure.</code><code class="descname">validate_list</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>validator=None</em>, <em>min_length=None</em>, <em>max_length=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datastructure.html#validate_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datastructure.validate_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks that the supplied value is a valid list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>list</em>) – The array to be validated.</li>
+<li><strong>validator</strong> (<em>func</em>) – A function to be called on each value in the list to check that it is
+valid.</li>
+<li><strong>min_length</strong> (<em>int</em>) – The minimum acceptable length for the list.  If <cite>None</cite>, the minimum
+length is not checked.</li>
+<li><strong>max_length</strong> (<em>int</em>) – The maximum acceptable length for the list.  If <cite>None</cite>, the maximum
+length is not checked.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.datastructure.validate_set">
+<code class="descclassname">validation.datastructure.</code><code class="descname">validate_set</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>validator=None</em>, <em>min_length=None</em>, <em>max_length=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datastructure.html#validate_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datastructure.validate_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validator to check a set and all entries in it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>set</em>) – The set to be validated.</li>
+<li><strong>validator</strong> (<em>func</em>) – A function to be called on each entry in the set to check that it is
+valid.</li>
+<li><strong>min_length</strong> (<em>int</em>) – The minimum acceptable number of entries in the set.  If <cite>None</cite>, the
+minimum size is not checked.</li>
+<li><strong>max_length</strong> (<em>int</em>) – The maximum acceptable number of entries in the set.  If <cite>None</cite>, the
+maximum size is not checked.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can be <cite>None</cite>.  Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.datastructure.validate_tuple">
+<code class="descclassname">validation.datastructure.</code><code class="descname">validate_tuple</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>schema=None</em>, <em>length=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datastructure.html#validate_tuple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datastructure.validate_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a tuple, checking it against an optional schema.</p>
+<p>The schema should be a tuple of validator functions, with each validator
+corresponding to an entry in the value to be checked.</p>
+<p>As an alternative, <cite>validate_tuple</cite> can accept a <cite>length</cite> argument.  Unlike
+the validators for other sequence types, <cite>validate_tuple</cite> will always
+enforce an exact length.  This is because the length of a tuple is part of
+its type.</p>
+<p>A simple example:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validator</span> <span class="o">=</span> <span class="n">validate_tuple</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="p">(</span>
+    <span class="n">validate_int</span><span class="p">(),</span> <span class="n">validate_int</span><span class="p">(),</span> <span class="n">validate_int</span><span class="p">(),</span>
+<span class="p">))</span>
+<span class="n">validator</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>tuple</em>) – The value to be validated.</li>
+<li><strong>schema</strong> (<em>tuple</em>) – An optional schema against which the value should be checked.</li>
+<li><strong>length</strong> (<em>int</em>) – The maximum length of the tuple.  <cite>schema</cite> and <cite>length</cite> arguments
+are mutually exclusive and must not be passed at the same time.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can’t be <cite>None</cite>. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="dictionaries">
+<h3>Dictionaries<a class="headerlink" href="#dictionaries" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="validation.datastructure.validate_mapping">
+<code class="descclassname">validation.datastructure.</code><code class="descname">validate_mapping</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>key_validator=None</em>, <em>value_validator=None</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datastructure.html#validate_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datastructure.validate_mapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a dictionary representing a simple mapping from keys of one type
+to values of another.</p>
+<p>For validating dictionaries representing structured data, where the keys
+are known ahead of time and values can have different constraints depending
+on the key, use <code class="xref py py-func docutils literal notranslate"><span class="pre">validate_struct()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>dict</em>) – The value to be validated.</li>
+<li><strong>key_validator</strong> (<em>func</em>) – Optional function to be call to check each of the keys in the
+dictionary.</li>
+<li><strong>value_validator</strong> (<em>func</em>) – Optional function to be call to check each of the values in the
+dictionary.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can’t be <cite>None</cite>. Defaults to <cite>True</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="validation.datastructure.validate_structure">
+<code class="descclassname">validation.datastructure.</code><code class="descname">validate_structure</code><span class="sig-paren">(</span><em>value=&lt;optional&gt;</em>, <em>schema=None</em>, <em>allow_extra=False</em>, <em>required=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/validation/datastructure.html#validate_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#validation.datastructure.validate_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a structured dictionary, with value types depending on the key,
+checking it against an optional schema.</p>
+<p>The schema should be a dictionary, with keys corresponding to the expected
+keys in <cite>value</cite>, but with the values replaced by functions which will be
+called to with the corresponding value in the input.</p>
+<p>For validating dictionaries that represent a mapping from one set of values
+to another, use <a class="reference internal" href="#validation.datastructure.validate_mapping" title="validation.datastructure.validate_mapping"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_mapping()</span></code></a>.</p>
+<p>A simple example:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">validator</span> <span class="o">=</span> <span class="n">validate_structure</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">validate_key</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;Model&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="n">validate_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+<span class="p">})</span>
+<span class="n">validator</span><span class="p">({</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">})</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>value</strong> (<em>dict</em>) – The value to be validated.</li>
+<li><strong>schema</strong> (<em>dict</em>) – The schema against which the value should be checked.</li>
+<li><strong>allow_extra</strong> (<em>bool</em>) – Set to <cite>True</cite> to ignore extra keys.</li>
+<li><strong>required</strong> (<em>bool</em>) – Whether the value can’t be <cite>None</cite>. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Validation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-validation-functions">Core Validation Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-validation.number">Numbers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-validation.string">Strings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-validation.datetime">Time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-validation.core">Other</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-validation.datastructure">Datastructure Validation Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sequences">Sequences</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dictionaries">Dictionaries</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="design.html" title="previous chapter">Design</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ben Mather <bwhmather@bwhmather.com>.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/reference.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,194 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installation &#8212; Validation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Guide" href="guide.html" />
+    <link rel="prev" title="Validation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">validation</span></code> library is available on <a class="reference external" href="https://pypi.python.org/pypi/validation">PyPI</a>.</p>
+<p>It can be installed manually using pip.</p>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install validation
+</pre></div>
+</div>
+<p>As this library is a useful tool for cleaning up established codebases, it will
+continue to support Python 2.7 for the foreseeable future.
+The string validation functions are particularly handy for sorting out unicode
+issues in preparation for making the jump to Python 3.</p>
+<div class="section" id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
+<p>This library follows the <a class="reference external" href="http://semver.org">semantic versioning scheme</a>.
+Broadly speaking, major versions contain breaks in backwards compatibility,
+minor versions contain changes that might prevent reverting to an earlier
+version, and patch versions contain only minor bug fixes and documentation
+improvements.</p>
+<p>Prior to version 1.0, all releases can contain breaking changes.</p>
+<p>As this library is likely to be used independently by multiple libraries that
+are included by a single project, we have to be more careful about what changes
+we allow in new major versions.
+As a rule, it should always be possible to write code that is compatible with
+two consecutive major versions.
+Most changes that would be allowed by a strict reading of the semantic
+versioning rules will be avoided or require the project to move to a new
+namespace.</p>
+<p>Due to the library’s limited scope we can be quite explicit about what changes
+can be expected in a release.</p>
+<p>Kinds of change that would require the project to be released under a new
+namespace:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Removing validation functions.</li>
+<li>Removing or changing the meaning of arguments to validation functions.</li>
+<li>Increasing the strictness of any existing validation function.  If a value
+passes validation by an older version with the same major version, it will
+pass validation with a newer version.</li>
+<li>Introducing new external dependencies.</li>
+<li>Anything else that would be expected to break existing users of the
+library.</li>
+</ul>
+</div></blockquote>
+<dl class="docutils">
+<dt>Kinds of changes that require a major version bump:</dt>
+<dd><ul class="first last simple">
+<li>Dropping support for older versions of python.</li>
+</ul>
+</dd>
+<dt>Kinds of change that require a minor version bump:</dt>
+<dd><ul class="first last simple">
+<li>Adding new validation functions.</li>
+<li>Adding new arguments to existing validation functions.</li>
+<li>Relaxing the strictness of any existing validation function.</li>
+<li>Any other changes that users of the library could use that would prevent
+their code from working with an older version.</li>
+</ul>
+</dd>
+<dt>Kinds of change that require only a patch version bump:</dt>
+<dd><ul class="first last simple">
+<li><strong>Changes to exception messages.</strong></li>
+<li><strong>Changes to the order in which conditions that result in the same
+exception are checked.</strong></li>
+<li>Bug-fixes that do not affect the expected behaviour.</li>
+<li>Documentation improvements.</li>
+<li>Re-releases to fix packaging issues.</li>
+</ul>
+</dd>
+</dl>
+<p>Libraries should specify a minimum minor version and maximum major version.
+Applications should do the same but are encouraged to pin a particular version
+for releases.</p>
+<p>Patches to backport bug-fixes will only be accepted for the latest minor
+versions of each major version.
+Only the latest major version will be actively supported.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Validation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="design.html">Design</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Validation</a></li>
+      <li>Next: <a href="guide.html" title="next chapter">Guide</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ben Mather <bwhmather@bwhmather.com>.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/installation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

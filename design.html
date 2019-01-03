@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Design &#8212; Validation 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="prev" title="Guide" href="guide.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="design">
+<h1>Design<a class="headerlink" href="#design" title="Permalink to this headline">¶</a></h1>
+<p>Validators are intended as an easy way to start rolling out type-checking in an existing codebase.</p>
+<div class="section" id="validators-only-raise-built-in-exceptions">
+<h2>Validators only raise built in exceptions<a class="headerlink" href="#validators-only-raise-built-in-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>This library does not introduce any custom exception types.
+It instead limits itself to the exception types defined in the standard
+library.
+This in practice means <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>, <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> or, on rare occasions,
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code>.</p>
+<p>There are two main reasons for this:</p>
+<ul class="simple">
+<li>Using built-in errors means that other libraries can use this package to
+validate arguments passed to their public API without catching, wrapping and
+re-raising the exceptions it raises, or leaking implementation details.</li>
+<li>Using built-in errors makes it much easier to mix custom validation with
+validation using the validation functions.
+There is no pressure to add a new class for every error condition, and no
+need to fit custom exceptions into the validation library exception
+hierarchy.</li>
+</ul>
+<p>The main reason to consider introducing custom exceptions is that it would
+allow calling code to behave differently depending on what issues were
+detected.
+For the intended application of this library, to serve as a runtime
+type-checker for function arguments, I don’t think that this would be useful.</p>
+</div>
+<div class="section" id="exceptions-raised-by-validators-will-contain-only-a-message">
+<h2>Exceptions raised by validators will contain only a message<a class="headerlink" href="#exceptions-raised-by-validators-will-contain-only-a-message" title="Permalink to this headline">¶</a></h2>
+<p>The reasons here are similar to the reasons for using built-in exceptions:</p>
+<ul class="simple">
+<li>It’s much easier to keep simple messages consistent.
+This is particularly important as we want to encourage mixing with custom
+validation code.</li>
+<li>It is expected that the exceptions will be interpreted by a developer, not by
+by the calling logic.
+There is no requirement for machine readable information.</li>
+<li>This restriction, along with the restriction on exception types, makes it
+easy to add context information to exceptions thrown from within the
+data-structure validation functions.</li>
+</ul>
+<p>There is also the simple reason that the standard library documentation demands
+it.</p>
+</div>
+<div class="section" id="validators-do-not-return-a-value">
+<h2>Validators do not return a value<a class="headerlink" href="#validators-do-not-return-a-value" title="Permalink to this headline">¶</a></h2>
+<p>If a value is not in the expected form going in then it is an error.</p>
+<p>Callers are likely to forget to use the fixed return value rather than the
+invalid original.</p>
+</div>
+<div class="section" id="validators-will-never-modify-the-values-that-they-are-passed">
+<h2>Validators will never modify the values that they are passed<a class="headerlink" href="#validators-will-never-modify-the-values-that-they-are-passed" title="Permalink to this headline">¶</a></h2>
+<p>This is for the same reason that validators do not return values, but in this case the justification is stronger.
+This is the reason that we do not provide generic validators for iterables: an iterator is a valid iterable, but would be rendered useless by the process of being validated.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Validation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guide.html">Guide</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Design</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="guide.html" title="previous chapter">Guide</a></li>
+      <li>Next: <a href="reference.html" title="next chapter">Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ben Mather <bwhmather@bwhmather.com>.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/design.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,831 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>validation.datastructure &#8212; Validation 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for validation.datastructure</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains functions for validating plain data-structures.</span>
+
+<span class="sd">These functions typically expect to be passed another validator function for</span>
+<span class="sd">one or more of their arguments, that will be used to check every entry, key or</span>
+<span class="sd">value that that the data-structure contains.</span>
+<span class="sd">All validator functions in this library, when called with no value argument,</span>
+<span class="sd">will return a closure that is intended to be used in this context.</span>
+
+<span class="sd">As an example, to check that a list contains only positive integers, you can</span>
+<span class="sd">call :func:`~validation.number.validate_int` with ``min_value`` equal to zero</span>
+<span class="sd">to create a closure that will check for positive integers, and pass it as the</span>
+<span class="sd">``validator`` argument to :func:`validate_list`.</span>
+
+<span class="sd">    &gt;&gt;&gt; from validation import validate_int</span>
+<span class="sd">    &gt;&gt;&gt; values = [3, 2, 1, -1]</span>
+<span class="sd">    &gt;&gt;&gt; validate_list(values, validator=validate_int(min_value=0))</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    ValueError: invalid item at position 3:  expected value less than 0, but \</span>
+<span class="sd">got -1</span>
+
+<span class="sd">Note that the exception raised here is not the exception that was raised by</span>
+<span class="sd">:func:`~validation.number.validate_int`.</span>
+<span class="sd">For the subset of built-in exceptions that can be raised, in normal usage, by</span>
+<span class="sd">validators in this library - namely :exc:`TypeError`, :exc:`ValueError`,</span>
+<span class="sd">:exc:`KeyError`, :exc:`IndexError` and :exc:`AssertionError` - we will attempt</span>
+<span class="sd">to create and raise a copy of the original with additional context information</span>
+<span class="sd">added to the message.</span>
+<span class="sd">The other built-in exceptions don&#39;t make sense as validation errors and so we</span>
+<span class="sd">don&#39;t try to catch them.</span>
+<span class="sd">There doesn&#39;t appear to be a safe way to extend custom exceptions so these are</span>
+<span class="sd">also left alone.</span>
+
+<span class="sd">There is no single ``validate_dict`` function.</span>
+<span class="sd">Dictionaries can be validated either as a mapping, that maps between keys of</span>
+<span class="sd">one type and values of another, using :func:`validate_mapping`, or as struct</span>
+<span class="sd">like objects, that map predefined keys to values with key specific types, using</span>
+<span class="sd">:func:`validate_structure`.</span>
+
+<span class="sd">The relationship between :func:`validate_list` and :func:`validate_tuple` is</span>
+<span class="sd">similar.  :func:`validate_list` expects the list to be homogeneous, while</span>
+<span class="sd">:func:`validate_tuple` will check each entry with its own validation function.</span>
+
+
+<span class="sd">Sequences</span>
+<span class="sd">---------</span>
+
+<span class="sd">.. autofunction:: validate_list</span>
+<span class="sd">.. autofunction:: validate_set</span>
+<span class="sd">.. autofunction:: validate_tuple</span>
+
+
+<span class="sd">Dictionaries</span>
+<span class="sd">------------</span>
+
+<span class="sd">.. autofunction:: validate_mapping</span>
+<span class="sd">.. autofunction:: validate_structure</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">six</span>
+
+<span class="kn">from</span> <span class="nn">.core</span> <span class="k">import</span> <span class="n">_validate_bool</span>
+<span class="kn">from</span> <span class="nn">.number</span> <span class="k">import</span> <span class="n">_validate_int</span>
+<span class="kn">from</span> <span class="nn">.common</span> <span class="k">import</span> <span class="n">make_optional_argument_default</span>
+
+
+<span class="n">_undefined</span> <span class="o">=</span> <span class="n">make_optional_argument_default</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_try_contextualize_exception</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Will attempt to re-raise a caught :exc:`TypeError`, :exc:`ValueError`,</span>
+<span class="sd">    :exc:`KeyError, :exc:`IndexError` or :exc:`AssertionError` with a</span>
+<span class="sd">    description of the context.</span>
+
+<span class="sd">    If the original error does not match the expected form, or is not one of</span>
+<span class="sd">    the supported types, will simply return without raising anything.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_traceback</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+
+    <span class="c1"># The list of built-in exceptions that it seems likely will be raised by a</span>
+    <span class="c1"># validation function in normal operation.  Stuff like :exc:`SyntaxError`</span>
+    <span class="c1"># probably indicates something more fundamental, for which the original</span>
+    <span class="c1"># exception is more useful.</span>
+    <span class="n">supported_exceptions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span>
+        <span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">,</span>
+        <span class="ne">AssertionError</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">supported_exceptions</span><span class="p">:</span>
+        <span class="c1"># No safe way to extend the message for subclasses.</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Check that the exception has been properly constructed.  The</span>
+    <span class="c1"># documentation requires that :exception:`TypeError`s and</span>
+    <span class="c1"># :exception:`ValueError`s are constructed with a single,</span>
+    <span class="c1"># string argument, but this is not enforced anywhere.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">exc_value</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exc_value</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{context}</span><span class="s2">: </span><span class="si">{message}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">exc_value</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">six</span><span class="o">.</span><span class="n">raise_from</span><span class="p">(</span><span class="n">exc_type</span><span class="p">(</span><span class="n">message</span><span class="p">),</span> <span class="n">exc_value</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_list</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;list&#39;, value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected at least </span><span class="si">{expected}</span><span class="s2"> elements, &quot;</span>
+            <span class="s2">&quot;but list contains only </span><span class="si">{actual}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="n">actual</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected at most </span><span class="si">{expected}</span><span class="s2"> elements, &quot;</span>
+            <span class="s2">&quot;but list contains </span><span class="si">{actual}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">actual</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">validator</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">_try_contextualize_exception</span><span class="p">(</span>
+                    <span class="s2">&quot;invalid item at position </span><span class="si">{index}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+
+<span class="k">class</span> <span class="nc">_list_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validator</span> <span class="o">=</span> <span class="n">validator</span>
+
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">min_length</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+            <span class="n">min_length</span> <span class="o">&gt;</span> <span class="n">max_length</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s1">&#39;minimum length </span><span class="si">{min!r}</span><span class="s1"> is greater than maximum length </span><span class="si">{max!r}</span><span class="s1">&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_length</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span> <span class="o">=</span> <span class="n">min_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span> <span class="o">=</span> <span class="n">max_length</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_list</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__validator</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;validator=</span><span class="si">{validator!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__validator</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;min_length=</span><span class="si">{min_length!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;max_length=</span><span class="si">{max_length!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_list(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_list"><a class="viewcode-back" href="../../reference.html#validation.datastructure.validate_list">[docs]</a><span class="k">def</span> <span class="nf">validate_list</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks that the supplied value is a valid list.</span>
+
+<span class="sd">    :param list value:</span>
+<span class="sd">        The array to be validated.</span>
+<span class="sd">    :param func validator:</span>
+<span class="sd">        A function to be called on each value in the list to check that it is</span>
+<span class="sd">        valid.</span>
+<span class="sd">    :param int min_length:</span>
+<span class="sd">        The minimum acceptable length for the list.  If `None`, the minimum</span>
+<span class="sd">        length is not checked.</span>
+<span class="sd">    :param int max_length:</span>
+<span class="sd">        The maximum acceptable length for the list.  If `None`, the maximum</span>
+<span class="sd">        length is not checked.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can be `None`.  Defaults to `True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_list_validator</span><span class="p">(</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="n">validator</span><span class="o">=</span><span class="n">validator</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_set</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;set&#39;, but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected at least </span><span class="si">{expected}</span><span class="s2"> entries, &quot;</span>
+            <span class="s2">&quot;but set contains only </span><span class="si">{actual}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="n">actual</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+            <span class="s2">&quot;expected at most </span><span class="si">{expected}</span><span class="s2"> entries, &quot;</span>
+            <span class="s2">&quot;but set contains </span><span class="si">{actual}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span> <span class="n">actual</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">validator</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_set_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validator</span><span class="p">,</span> <span class="n">min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__validator</span> <span class="o">=</span> <span class="n">validator</span>
+
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">min_length</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">max_length</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+            <span class="n">min_length</span> <span class="o">&gt;</span> <span class="n">max_length</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s1">&#39;minimum length </span><span class="si">{min!r}</span><span class="s1"> is greater than maximum length </span><span class="si">{max!r}</span><span class="s1">&#39;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">max_length</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span> <span class="o">=</span> <span class="n">min_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span> <span class="o">=</span> <span class="n">max_length</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_set</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__validator</span><span class="p">,</span>
+            <span class="n">min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;validator=</span><span class="si">{validator!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__validator</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;min_length=</span><span class="si">{min_length!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">min_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__min_length</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;max_length=</span><span class="si">{max_length!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__max_length</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_set(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_set"><a class="viewcode-back" href="../../reference.html#validation.datastructure.validate_set">[docs]</a><span class="k">def</span> <span class="nf">validate_set</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validator to check a set and all entries in it.</span>
+
+<span class="sd">    :param set value:</span>
+<span class="sd">        The set to be validated.</span>
+<span class="sd">    :param func validator:</span>
+<span class="sd">        A function to be called on each entry in the set to check that it is</span>
+<span class="sd">        valid.</span>
+<span class="sd">    :param int min_length:</span>
+<span class="sd">        The minimum acceptable number of entries in the set.  If `None`, the</span>
+<span class="sd">        minimum size is not checked.</span>
+<span class="sd">    :param int max_length:</span>
+<span class="sd">        The maximum acceptable number of entries in the set.  If `None`, the</span>
+<span class="sd">        maximum size is not checked.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can be `None`.  Defaults to `True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_set_validator</span><span class="p">(</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="n">min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">max_length</span><span class="p">,</span>
+        <span class="n">validator</span><span class="o">=</span><span class="n">validator</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_mapping</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">key_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;dict&#39;, but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">item_key</span><span class="p">,</span> <span class="n">item_value</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">key_validator</span><span class="p">(</span><span class="n">item_key</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">_try_contextualize_exception</span><span class="p">(</span>
+                    <span class="s2">&quot;invalid key </span><span class="si">{key!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">item_key</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="n">value_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value_validator</span><span class="p">(</span><span class="n">item_value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">_try_contextualize_exception</span><span class="p">(</span>
+                    <span class="s2">&quot;invalid value for key </span><span class="si">{key!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">item_key</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+
+<span class="k">class</span> <span class="nc">_mapping_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_validator</span><span class="p">,</span> <span class="n">value_validator</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__key_validator</span> <span class="o">=</span> <span class="n">key_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value_validator</span> <span class="o">=</span> <span class="n">value_validator</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_mapping</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">key_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__key_validator</span><span class="p">,</span>
+            <span class="n">value_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__value_validator</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__key_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;key_validator=</span><span class="si">{key_validator!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">key_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__key_validator</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;value_validator=</span><span class="si">{value_validator!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">value_validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__value_validator</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_mapping(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_mapping"><a class="viewcode-back" href="../../reference.html#validation.datastructure.validate_mapping">[docs]</a><span class="k">def</span> <span class="nf">validate_mapping</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">key_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates a dictionary representing a simple mapping from keys of one type</span>
+<span class="sd">    to values of another.</span>
+
+<span class="sd">    For validating dictionaries representing structured data, where the keys</span>
+<span class="sd">    are known ahead of time and values can have different constraints depending</span>
+<span class="sd">    on the key, use :func:`validate_struct`.</span>
+
+<span class="sd">    :param dict value:</span>
+<span class="sd">        The value to be validated.</span>
+<span class="sd">    :param func key_validator:</span>
+<span class="sd">        Optional function to be call to check each of the keys in the</span>
+<span class="sd">        dictionary.</span>
+<span class="sd">    :param func value_validator:</span>
+<span class="sd">        Optional function to be call to check each of the values in the</span>
+<span class="sd">        dictionary.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can&#39;t be `None`. Defaults to `True`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_mapping_validator</span><span class="p">(</span>
+        <span class="n">key_validator</span><span class="o">=</span><span class="n">key_validator</span><span class="p">,</span>
+        <span class="n">value_validator</span><span class="o">=</span><span class="n">value_validator</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_structure</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_extra</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;dict&#39; but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">validator</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">((</span>
+                    <span class="s2">&quot;dictionary missing expected key: </span><span class="si">{key!r}</span><span class="s2">&quot;</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">dictionary</span><span class="o">=</span><span class="n">value</span><span class="p">))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">validator</span><span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">_try_contextualize_exception</span><span class="p">(</span>
+                    <span class="s2">&quot;invalid value for key </span><span class="si">{key!r}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_extra</span> <span class="ow">and</span> <span class="nb">set</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">((</span>
+                <span class="s2">&quot;dictionary contains unexpected keys: </span><span class="si">{unexpected}</span><span class="s2">&quot;</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">unexpected</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="nb">repr</span><span class="p">(</span><span class="n">unexpected</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">unexpected</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">_structure_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">allow_extra</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="n">_validate_structure</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Make a copy of the schema to make sure it won&#39;t be mutated while</span>
+            <span class="c1"># we are using it.</span>
+            <span class="n">schema</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__schema</span> <span class="o">=</span> <span class="n">schema</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">allow_extra</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__allow_extra</span> <span class="o">=</span> <span class="n">allow_extra</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_structure</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__schema</span><span class="p">,</span>
+            <span class="n">allow_extra</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_extra</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;schema=</span><span class="si">{schema!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__schema</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_extra</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;allow_extra=</span><span class="si">{allow_extra!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">allow_extra</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__allow_extra</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_structure(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_structure"><a class="viewcode-back" href="../../reference.html#validation.datastructure.validate_structure">[docs]</a><span class="k">def</span> <span class="nf">validate_structure</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">allow_extra</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates a structured dictionary, with value types depending on the key,</span>
+<span class="sd">    checking it against an optional schema.</span>
+
+<span class="sd">    The schema should be a dictionary, with keys corresponding to the expected</span>
+<span class="sd">    keys in `value`, but with the values replaced by functions which will be</span>
+<span class="sd">    called to with the corresponding value in the input.</span>
+
+<span class="sd">    For validating dictionaries that represent a mapping from one set of values</span>
+<span class="sd">    to another, use :func:`validate_mapping`.</span>
+
+<span class="sd">    A simple example:</span>
+
+<span class="sd">    .. code:: python</span>
+
+<span class="sd">        validator = validate_structure(schema={</span>
+<span class="sd">            &#39;id&#39;: validate_key(kind=&#39;Model&#39;),</span>
+<span class="sd">            &#39;count&#39;: validate_int(min=0),</span>
+<span class="sd">        })</span>
+<span class="sd">        validator({&#39;id&#39;: self.key, &#39;count&#39;: self.count})</span>
+
+<span class="sd">    :param dict value:</span>
+<span class="sd">        The value to be validated.</span>
+<span class="sd">    :param dict schema:</span>
+<span class="sd">        The schema against which the value should be checked.</span>
+<span class="sd">    :param bool allow_extra:</span>
+<span class="sd">        Set to `True` to ignore extra keys.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can&#39;t be `None`. Defaults to True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_structure_validator</span><span class="p">(</span>
+        <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">allow_extra</span><span class="o">=</span><span class="n">allow_extra</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_tuple</span><span class="p">(</span>
+    <span class="n">value</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;required value is None&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected &#39;tuple&#39; but value is of type </span><span class="si">{cls!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+    <span class="c1"># If a schema is provided, its length takes priority over then value in</span>
+    <span class="c1"># the length argument.  `_tuple_validator` is responsible for ensuring</span>
+    <span class="c1"># that the two are mutually exclusive.</span>
+    <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="n">length</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">((</span>
+            <span class="s2">&quot;expected tuple of length </span><span class="si">{expected}</span><span class="s2"> &quot;</span>
+            <span class="s2">&quot;but value is of length </span><span class="si">{actual}</span><span class="s2">&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expected</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">actual</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">validator</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span> <span class="n">value</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">validator</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="n">_try_contextualize_exception</span><span class="p">(</span>
+                    <span class="s2">&quot;invalid value at index </span><span class="si">{index}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">raise</span>
+
+
+<span class="k">class</span> <span class="nc">_tuple_validator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;length and schema arguments are mutually exclusive&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">_validate_int</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__length</span> <span class="o">=</span> <span class="n">length</span>
+
+        <span class="n">_validate_tuple</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__schema</span> <span class="o">=</span> <span class="n">schema</span>
+
+        <span class="n">_validate_bool</span><span class="p">(</span><span class="n">required</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__required</span> <span class="o">=</span> <span class="n">required</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">_validate_tuple</span><span class="p">(</span>
+            <span class="n">value</span><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__length</span><span class="p">,</span>
+            <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__schema</span><span class="p">,</span>
+            <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;schema=</span><span class="si">{schema!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__schema</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;length=</span><span class="si">{length!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__length</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;required=</span><span class="si">{required!r}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">required</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__required</span><span class="p">,</span>
+            <span class="p">))</span>
+
+        <span class="k">return</span> <span class="s1">&#39;validate_tuple(</span><span class="si">{args}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="validate_tuple"><a class="viewcode-back" href="../../reference.html#validation.datastructure.validate_tuple">[docs]</a><span class="k">def</span> <span class="nf">validate_tuple</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="n">_undefined</span><span class="p">,</span>
+    <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates a tuple, checking it against an optional schema.</span>
+
+<span class="sd">    The schema should be a tuple of validator functions, with each validator</span>
+<span class="sd">    corresponding to an entry in the value to be checked.</span>
+
+<span class="sd">    As an alternative, `validate_tuple` can accept a `length` argument.  Unlike</span>
+<span class="sd">    the validators for other sequence types, `validate_tuple` will always</span>
+<span class="sd">    enforce an exact length.  This is because the length of a tuple is part of</span>
+<span class="sd">    its type.</span>
+
+<span class="sd">    A simple example:</span>
+
+<span class="sd">    .. code:: python</span>
+
+<span class="sd">        validator = validate_tuple(schema=(</span>
+<span class="sd">            validate_int(), validate_int(), validate_int(),</span>
+<span class="sd">        ))</span>
+<span class="sd">        validator((1, 2, 3))</span>
+
+<span class="sd">    :param tuple value:</span>
+<span class="sd">        The value to be validated.</span>
+<span class="sd">    :param tuple schema:</span>
+<span class="sd">        An optional schema against which the value should be checked.</span>
+<span class="sd">    :param int length:</span>
+<span class="sd">        The maximum length of the tuple.  `schema` and `length` arguments</span>
+<span class="sd">        are mutually exclusive and must not be passed at the same time.</span>
+<span class="sd">    :param bool required:</span>
+<span class="sd">        Whether the value can&#39;t be `None`. Defaults to True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate</span> <span class="o">=</span> <span class="n">_tuple_validator</span><span class="p">(</span>
+        <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_undefined</span><span class="p">:</span>
+        <span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">validate</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Validation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../guide.html">Guide</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design.html">Design</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Ben Mather <bwhmather@bwhmather.com>.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
