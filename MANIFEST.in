@@ -6,6 +6,7 @@ include setup.py
 recursive-include validation *.py
 
 # Include type annotation stub files.
+include validation/py.typed
 recursive-include validation *.pyi
 
 # Include documentation.

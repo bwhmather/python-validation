@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-from . import unittest
+import unittest
 import sys
 
 import six

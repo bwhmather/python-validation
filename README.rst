@@ -3,16 +3,16 @@ Python Validation
 
 |build-status| |coverage|
 
-.. |build-status| image:: https://travis-ci.org/bwhmather/python-validation.png?branch=develop
+.. |build-status| image:: https://travis-ci.org/bwhmather/python-validation.svg?branch=develop
     :target: https://travis-ci.org/bwhmather/python-validation
     :alt: Build Status
-.. |coverage| image:: https://coveralls.io/repos/bwhmather/python-validation/badge.png?branch=develop
-    :target: https://coveralls.io/r/bwhmather/python-validation?branch=develop
+.. |coverage| image:: https://coveralls.io/repos/github/bwhmather/python-validation/badge.svg?branch=develop
+    :target: https://coveralls.io/github/bwhmather/python-validation?branch=develop
     :alt: Coverage
 
 .. begin-docs
 
-A simple python library containing functions that check python values.
+A simple Python library containing functions that check Python values.
 It is intended to make it easy to verify commonly expected pre-conditions on
 arguments to functions.
 
@@ -23,7 +23,7 @@ Installation
 ------------
 .. begin-installation
 
-The ``validation`` library is available on `pypi <https://pypi.python.org/pypi/validation>`_.
+The ``validation`` library is available on `PyPI <https://pypi.python.org/pypi/validation>`_.
 
 It can be installed manually using pip.
 
@@ -32,9 +32,9 @@ It can be installed manually using pip.
     $ pip install validation
 
 As this library is a useful tool for cleaning up established codebases, it will
-continue to support python 2.6 and 2.7 for the foreseeable future.
+continue to support Python 2.7 for the foreseeable future.
 The string validation functions are particularly handy for sorting out unicode
-issues in preparation for making the jump to python 3.
+issues in preparation for making the jump to Python 3.
 
 .. end-installation
 
@@ -62,7 +62,7 @@ the head of public functions to check their arguments.
         :param int int_arg:
             A non-optional integer.  Must be between one and ten.
         :param dict dict_arg:
-            A dictionary containing an integer id, and a floating point amount.
+            A dictionary containing an integer ID, and a floating point amount.
         :param str unicode_arg:
             An optional string.
         """
@@ -100,9 +100,9 @@ for email addresses and domain names.
 
 Functions are fairly strict by default.
 ``validate_float``, for example, will reject ``NaN`` unless explicitly allowed.
-On python 2 ``validate_text`` will enforce the use of unicode.
+On Python 2 ``validate_text`` will enforce the use of unicode.
 
-Intended to be mixed with normal python code to perform more complex
+Intended to be mixed with normal Python code to perform more complex
 validation.
 As an example, the library provides no tools to assert that to values are
 mutually exclusive as this requirement is much more clearly expressed with a
@@ -127,6 +127,7 @@ Exceptions raised by the validation library are not intended to be caught.
 We assume that validation failures indicate that the caller is being used
 incorrectly and that the error and will be interpreted by a programmer and not
 the machine.
+
 We use built-in exception classes rather than defining custom ones so that
 libraries that use our functions can allow them to fall through their public
 interface.

@@ -1,5 +1,3 @@
-import sys
-
 from setuptools import setup, find_packages
 
 
@@ -10,13 +8,11 @@ with open('README.rst') as _readme_file:
 tests_require = [
     'pytz',
 ]
-if sys.version_info < (2, 7):
-    tests_require += ['unittest2']
 
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.4.2',
+    version='0.5.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
@@ -30,13 +26,14 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=[
         'six >= 1.10, < 2',
     ],
@@ -46,7 +43,7 @@ setup(
     },
     packages=find_packages(),
     package_data={
-        '': ['*.pyi'],
+        '': ['*.pyi', 'py.typed'],
     },
     entry_points={
         'console_scripts': [
