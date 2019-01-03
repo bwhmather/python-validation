@@ -7,7 +7,7 @@ import re
 try:
     from typing.re import Pattern as _pattern_type
 except ImportError:  # pragma: no cover
-    _pattern_type = re._pattern_type
+    _pattern_type = re._pattern_type  # pylint: disable=no-member
 
 import six
 
