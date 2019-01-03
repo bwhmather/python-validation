@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-from . import unittest
+import unittest
 
 from validation import validate_int, validate_set
 
@@ -10,15 +8,15 @@ class ValidateSetTestCase(unittest.TestCase):
         validate_set(set())
 
     def test_non_empty_no_validator(self):  # type: () -> None
-        validate_set(set([1, 'string']))
+        validate_set({1, 'string'})
 
     def test_validator_valid(self):  # type: () -> None
-        validate_set(set([1, 2, 3]), validator=validate_int())
+        validate_set({1, 2, 3}, validator=validate_int())
 
     def test_validator_invalid(self):  # type: () -> None
         with self.assertRaises(ValueError):
             validate_set(
-                set([1, 2, 3, -1]),
+                {1, 2, 3, -1},
                 validator=validate_int(min_value=0),
             )
 
@@ -27,17 +25,17 @@ class ValidateSetTestCase(unittest.TestCase):
             validate_set([1], validator=validate_int())
 
     def test_min_len_valid(self):  # type: () -> None
-        validate_set(set([1, 2, 3]), min_length=3)
+        validate_set({1, 2, 3}, min_length=3)
 
     def test_min_len_invalid(self):  # type: () -> None
         with self.assertRaises(ValueError):
-            validate_set(set([1, 2, 3]), min_length=4)
+            validate_set({1, 2, 3}, min_length=4)
 
     def test_max_len_valid(self):  # type: () -> None
-        validate_set(set([1, 2, 3]), max_length=3)
+        validate_set({1, 2, 3}, max_length=3)
 
         with self.assertRaises(ValueError):
-            validate_set(set([1, 2, 3, 4]), max_length=3)
+            validate_set({1, 2, 3, 4}, max_length=3)
 
     def test_not_required(self):  # type: () -> None
         validate_set(None, required=False)
@@ -48,9 +46,9 @@ class ValidateSetTestCase(unittest.TestCase):
 
     def test_closure(self):  # type: () -> None
         validator = validate_set(max_length=3)
-        validator(set([1]))
+        validator({1})
         with self.assertRaises(ValueError):
-            validator(set([1, 2, 3, 4]))
+            validator({1, 2, 3, 4})
 
     def test_repr_1(self):  # type: () -> None
         validator = validate_set(min_length=1, max_length=100)

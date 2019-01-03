@@ -1,7 +1,5 @@
 language: python
-sudo: false
 python:
-  - "2.6"
   - "2.7"
   - "3.4"
   - "3.5"
@@ -11,15 +9,15 @@ install:
   - "pip install -e .[test]"
   - "pip install coveralls"
   - "pip install pycodestyle"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pyflakes; fi"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pip install pylint; fi"
+  - "pip install pyflakes"
+  - "pip install pylint"
   - "if [ \"${TRAVIS_PYTHON_VERSION}\" == '3.6' ]; then pip install sphinx; fi"
 
 script:
   - "coverage run --source=validation setup.py test"
   - "pycodestyle validation setup.py"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pyflakes validation setup.py; fi"
-  - "if [ \"${TRAVIS_PYTHON_VERSION}\" != '2.6' ]; then pylint -E validation setup.py; fi"
+  - "pyflakes validation setup.py"
+  - "pylint -E validation setup.py"
 
 after_success:
   - "coveralls"
