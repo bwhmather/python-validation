@@ -43,7 +43,7 @@ setup(
     },
     packages=find_packages(),
     package_data={
-        '': ['*.pyi'],
+        '': ['*.pyi', 'py.typed'],
     },
     entry_points={
         'console_scripts': [
