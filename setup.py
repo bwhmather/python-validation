@@ -6,7 +6,7 @@ with open('README.rst') as _readme_file:
 
 
 tests_require = [
-    'pytz',
+    'pytz', 'idna'
 ]
 
 setup(
@@ -42,6 +42,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
+        'email': ['idna >= 3.1']
     },
     packages=find_packages(),
     package_data={
