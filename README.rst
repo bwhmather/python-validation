@@ -1,7 +1,7 @@
 Python Validation
 =================
 
-|build-status| |coverage|
+|build-status|
 
 .. |build-status| image:: https://github.com/bwhmather/python-validation/actions/workflows/ci.yaml/badge.svg?branch=develop
     :target: https://github.com/bwhmather/python-validation/actions/workflows/ci.yaml
