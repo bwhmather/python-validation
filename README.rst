@@ -3,8 +3,8 @@ Python Validation
 
 |build-status| |coverage|
 
-.. |build-status| image:: https://travis-ci.org/bwhmather/python-validation.svg?branch=develop
-    :target: https://travis-ci.org/bwhmather/python-validation
+.. |build-status| image:: https://github.com/bwhmather/python-validation/actions/workflows/ci.yaml/badge.svg?branch=develop
+    :target: https://github.com/bwhmather/python-validation/actions/workflows/ci.yaml
     :alt: Build Status
 .. |coverage| image:: https://coveralls.io/repos/github/bwhmather/python-validation/badge.svg?branch=develop
     :target: https://coveralls.io/github/bwhmather/python-validation?branch=develop
