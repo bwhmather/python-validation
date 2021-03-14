@@ -481,7 +481,7 @@ def _validate_structure(
             if key not in value:
                 raise KeyError((
                     "dictionary missing expected key: {key!r}"
-                ).format(key=key, dictionary=value))
+                ).format(key=key))
 
             try:
                 validator(value[key])

@@ -14,6 +14,7 @@ from . import (
     test_structure,
     test_tuple,
     test_optional_argument,
+    test_email,
 )  # noqa:
 
 
@@ -32,4 +33,5 @@ suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_structure),  # type: ignore
     loader.loadTestsFromModule(test_tuple),  # type: ignore
     loader.loadTestsFromModule(test_optional_argument),  # type: ignore
+    loader.loadTestsFromModule(test_email),  # type: ignore
 ))

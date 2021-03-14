@@ -6,13 +6,13 @@ with open('README.rst') as _readme_file:
 
 
 tests_require = [
-    'pytz',
+    'pytz', 'idna'
 ]
 
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.5.0',
+    version='0.6.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
@@ -32,6 +32,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=[
@@ -40,6 +42,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
+        'email': ['idna >= 3.1']
     },
     packages=find_packages(),
     package_data={

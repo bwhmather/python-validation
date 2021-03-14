@@ -21,6 +21,8 @@ from .datastructure import (
     validate_tuple,
 )
 
+from .email import validate_email_address
+
 __all__ = [
     'validate_int', 'validate_float', 'validate_bool',
     'validate_text', 'validate_bytes',
@@ -28,4 +30,5 @@ __all__ = [
     'validate_list', 'validate_set',
     'validate_mapping', 'validate_structure',
     'validate_tuple',
+    'validate_email_address',
 ]
