@@ -12,7 +12,7 @@ tests_require = [
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.6.0',
+    version='0.6.1',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
@@ -42,7 +42,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
-        'email': ['idna >= 3.1']
+        'email': ['idna >= 2.0.0']
     },
     packages=find_packages(),
     package_data={
