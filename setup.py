@@ -42,7 +42,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'test': tests_require,
-        'email': ['idna >= 3.1']
+        'email': ['idna >= 2.0.0']
     },
     packages=find_packages(),
     package_data={
