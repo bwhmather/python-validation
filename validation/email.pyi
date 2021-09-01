@@ -1,10 +1,10 @@
-from typing import Union, overload, Callable, Optional
+from typing import Union, overload, Callable, Optional, Text
 
 import six
 
 @overload
 def validate_email_address(
-    value: six.text_type,
+    value: Text,
     *,
     allow_unnormalized: bool=False,
     allow_smtputf8: bool=True,
@@ -12,7 +12,7 @@ def validate_email_address(
 
 @overload
 def validate_email_address(
-    value: Optional[six.text_type],
+    value: Optional[Text],
     *,
     allow_unnormalized: bool=False,
     allow_smtputf8: bool=True,
@@ -25,11 +25,11 @@ def validate_email_address(
     allow_unnormalized: bool=False,
     allow_smtputf8: bool=True,
     required: bool,
-) -> Callable[[Optional[six.text_type]], None]: ...
+) -> Callable[[Optional[Text]], None]: ...
 
 @overload
 def validate_email_address(
     *,
     allow_unnormalized: bool=False,
     allow_smtputf8: bool=True,
-) -> Callable[[six.text_type], None]: ...
+) -> Callable[[Text], None]: ...
