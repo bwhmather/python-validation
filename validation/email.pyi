@@ -24,5 +24,12 @@ def validate_email_address(
     *,
     allow_unnormalized: bool=False,
     allow_smtputf8: bool=True,
-    required: bool=True,
+    required: bool,
+) -> Callable[[Optional[six.text_type]], None]: ...
+
+@overload
+def validate_email_address(
+    *,
+    allow_unnormalized: bool=False,
+    allow_smtputf8: bool=True,
 ) -> Callable[[six.text_type], None]: ...
