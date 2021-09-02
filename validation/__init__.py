@@ -21,6 +21,8 @@ from .datastructure import (
     validate_tuple,
 )
 
+from .uuid import validate_uuid
+
 from .email import validate_email_address
 
 __all__ = [
@@ -29,6 +31,6 @@ __all__ = [
     'validate_date', 'validate_datetime',
     'validate_list', 'validate_set',
     'validate_mapping', 'validate_structure',
-    'validate_tuple',
+    'validate_tuple', 'validate_uuid',
     'validate_email_address',
 ]
