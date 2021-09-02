@@ -12,7 +12,7 @@ tests_require = [
 setup(
     name='validation',
     url='https://github.com/bwhmather/python-validation',
-    version='0.6.1',
+    version='0.7.0',
     author='Ben Mather',
     author_email='bwhmather@bwhmather.com',
     maintainer='',
