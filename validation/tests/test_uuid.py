@@ -8,14 +8,35 @@ class ValidateUUIDTestCase(unittest.TestCase):
     def test_uuid1_valid(self):
         validate_uuid(uuid.uuid1())
 
+    def test_uuid1_expected_valid(self):
+        validate_uuid(uuid.uuid1(), version=1)
+
+    def test_uuid1_expected_invalid(self):
+        with self.assertRaises(ValueError):
+            validate_uuid(uuid.uuid4(), version=1)
+
     def test_uuid3_valid(self):
         validate_uuid(uuid.uuid3(uuid.uuid4(), "name"))
+
+    def test_uuid3_expected_valid(self):
+        validate_uuid(uuid.uuid3(uuid.uuid4(), "name"), version=3)
+
+    def test_uuid3_expected_invalid(self):
+        with self.assertRaises(ValueError):
+            validate_uuid(uuid.uuid4(), version=3)
 
     def test_uuid4_valid(self):
         validate_uuid(uuid.uuid4())
 
     def test_uuid5_valid(self):
         validate_uuid(uuid.uuid5(uuid.uuid4(), "name"))
+
+    def test_rfc4122_valid(self):
+        validate_uuid(uuid.uuid4(), variant=uuid.RFC_4122)
+
+    def test_microsoft_invalid(self):
+        with self.assertRaises(ValueError):
+            validate_uuid(uuid.uuid4(), variant=uuid.RESERVED_MICROSOFT)
 
     def test_not_required(self):
         validate_uuid(None, required=False)
