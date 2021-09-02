@@ -5,7 +5,7 @@ from validation import validate_uuid
 
 
 class ValidateUUIDTestCase(unittest.TestCase):
-    def test_uuid1_valid(self):  # type: () -> None
+    def test_uuid1_valid(self):
         validate_uuid(uuid.uuid1())
 
     def test_uuid3_valid(self):
@@ -17,21 +17,21 @@ class ValidateUUIDTestCase(unittest.TestCase):
     def test_uuid5_valid(self):
         validate_uuid(uuid.uuid5(uuid.uuid4(), "name"))
 
-    def test_not_required(self):  # type: () -> None
+    def test_not_required(self):
         validate_uuid(None, required=False)
 
     def test_required(self):
         with self.assertRaises(TypeError):
             validate_uuid(None)
 
-    def test_repr_required_false(self):  # type: () -> None
+    def test_repr_required_false(self):
         validator = validate_uuid(required=False)
         self.assertEqual(
             repr(validator),
             'validate_uuid(required=False)',
         )
 
-    def test_repr_full(self):  # type: () -> None
+    def test_repr_full(self):
         validator = validate_uuid(variant=uuid.RFC_4122, version=3)
         self.assertEqual(
             repr(validator),
