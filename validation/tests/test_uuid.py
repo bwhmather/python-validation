@@ -38,6 +38,10 @@ class ValidateUUIDTestCase(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_uuid(uuid.uuid4(), variant=uuid.RESERVED_MICROSOFT)
 
+    def test_incompatible_variant_version(self):
+        with self.assertRaises(ValueError):
+            validate_uuid(variant=uuid.RESERVED_MICROSOFT, version=4)
+
     def test_not_required(self):
         validate_uuid(None, required=False)
 
