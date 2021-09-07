@@ -463,7 +463,7 @@ def validate_mapping(
 
 def _validate_structure(
     value,
-    schema=None, allow_extra=False,
+    schema=None, allow_extra=False, missing_as_none=False,
     required=True,
 ):
     if value is None:
@@ -478,20 +478,20 @@ def _validate_structure(
 
     if schema is not None:
         for key, validator in schema.items():
-            if key not in value:
+            if not missing_as_none and key not in value:
                 raise KeyError((
                     "dictionary missing expected key: {key!r}"
                 ).format(key=key))
 
             try:
-                validator(value[key])
+                validator(value.get(key, None))
             except (TypeError, ValueError, KeyError):
                 _try_contextualize_exception(
                     "invalid value for key {key!r}".format(key=key),
                 )
                 raise
 
-        if not allow_extra and set(schema) != set(value):
+        if not allow_extra and set(value) - set(schema):
             raise ValueError((
                 "dictionary contains unexpected keys: {unexpected}"
             ).format(
@@ -503,7 +503,7 @@ def _validate_structure(
 
 
 class _structure_validator(object):
-    def __init__(self, schema, allow_extra, required):
+    def __init__(self, schema, allow_extra, missing_as_none, required):
         _validate_structure(schema, schema=None, required=False)
         if schema is not None:
             # Make a copy of the schema to make sure it won't be mutated while
@@ -514,6 +514,9 @@ class _structure_validator(object):
         _validate_bool(allow_extra)
         self.__allow_extra = allow_extra
 
+        _validate_bool(missing_as_none)
+        self.__missing_as_none = missing_as_none
+
         _validate_bool(required)
         self.__required = required
 
@@ -522,6 +525,7 @@ class _structure_validator(object):
             value,
             schema=self.__schema,
             allow_extra=self.__allow_extra,
+            missing_as_none=self.__missing_as_none,
             required=self.__required,
         )
 
@@ -537,6 +541,11 @@ class _structure_validator(object):
                 allow_extra=self.__allow_extra,
             ))
 
+        if self.__missing_as_none:
+            args.append('missing_as_none={missing_as_none!r}'.format(
+                missing_as_none=self.__missing_as_none,
+            ))
+
         if not self.__required:
             args.append('required={required!r}'.format(
                 required=self.__required,
@@ -547,7 +556,9 @@ class _structure_validator(object):
 
 def validate_structure(
     value=_undefined,
-    schema=None, allow_extra=False,
+    schema=None,
+    allow_extra=False,
+    missing_as_none=False,
     required=True,
 ):
     """
@@ -577,11 +588,18 @@ def validate_structure(
         The schema against which the value should be checked.
     :param bool allow_extra:
         Set to `True` to ignore extra keys.
+    :param bool missing_as_none:
+        Set to treat keys that are absent from the structure as if they had
+        been set to None.  Default is to raise an error if any keys are
+        missing.
     :param bool required:
         Whether the value can't be `None`. Defaults to True.
     """
     validate = _structure_validator(
-        schema=schema, allow_extra=allow_extra, required=required,
+        schema=schema,
+        allow_extra=allow_extra,
+        missing_as_none=missing_as_none,
+        required=required,
     )
 
     if value is not _undefined:

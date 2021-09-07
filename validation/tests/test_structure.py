@@ -85,6 +85,21 @@ class ValidateStructureTestCase(unittest.TestCase):
             'unexpected': 2,
         })
 
+    def test_schema_missing_as_none_required(self):  # type: () -> None
+        validator = validate_structure(schema={
+            'required': validate_int(),
+        }, missing_as_none=True)
+
+        with self.assertRaises(TypeError):
+            validator({})
+
+    def test_schema_missing_as_none_optional(self):  # type: () -> None
+        validator = validate_structure(schema={
+            'required': validate_int(required=False),
+        }, missing_as_none=True)
+
+        validator({})
+
     def test_repr_1(self):  # type: () -> None
         validator = validate_structure(schema={'key': validate_int()})
         self.assertEqual(
