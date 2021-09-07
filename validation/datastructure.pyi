@@ -194,8 +194,10 @@ def validate_mapping(
 @overload
 def validate_structure(
     value: Dict,
-    *, allow_extra: bool=False,
+    *,
     schema: Dict=None,
+    allow_extra: bool=False,
+    missing_as_none: bool=False,
 ) -> None:
     ...
 
@@ -203,8 +205,10 @@ def validate_structure(
 @overload
 def validate_structure(
     value: Optional[Dict],
-    *, allow_extra: bool=False,
+    *,
     schema: Dict=None,
+    allow_extra: bool=False,
+    missing_as_none: bool=False,
     required: bool,
 ) -> None:
     ...
@@ -212,16 +216,20 @@ def validate_structure(
 
 @overload
 def validate_structure(
-    *, allow_extra: bool=False,
+    *,
     schema: Dict=None,
+    allow_extra: bool=False,
+    missing_as_none: bool=False,
 ) -> Callable[[Dict], None]:
     ...
 
 
 @overload
 def validate_structure(
-    *, allow_extra: bool=False,
+    *,
     schema: Dict=None,
+    allow_extra: bool=False,
+    missing_as_none: bool=False,
     required: bool,
 ) -> Callable[[Optional[Dict]], None]:
     ...
