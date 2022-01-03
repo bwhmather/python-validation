@@ -2,6 +2,8 @@
 
 import re
 import unicodedata
+# The `idna` package is only installed if `validation` is installed with the
+# `email` extras tag.
 import idna
 import six
 
