@@ -23,7 +23,12 @@ from .datastructure import (
 
 from .uuid import validate_uuid
 
-from .email import validate_email_address
+try:
+    from .email import validate_email_address
+except ImportError:
+    # `validate_email_address` is only available if the `idna` package is
+    # installed.  Depend on `validation[email]` to pull in the right version.
+    pass
 
 __all__ = [
     'validate_int', 'validate_float', 'validate_bool',
