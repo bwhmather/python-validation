@@ -8,6 +8,7 @@ from . import (
     test_bytes,
     test_date,
     test_datetime,
+    test_timedelta,
     test_list,
     test_set,
     test_mapping,
@@ -28,6 +29,7 @@ suite = unittest.TestSuite((
     loader.loadTestsFromModule(test_bytes),  # type: ignore
     loader.loadTestsFromModule(test_date),  # type: ignore
     loader.loadTestsFromModule(test_datetime),  # type: ignore
+    loader.loadTestsFromModule(test_timedelta),  # type: ignore
     loader.loadTestsFromModule(test_list),  # type: ignore
     loader.loadTestsFromModule(test_set),  # type: ignore
     loader.loadTestsFromModule(test_mapping),  # type: ignore
