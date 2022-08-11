@@ -86,7 +86,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mypy types-pytz types-six
+        pip install mypy==0.930 types-pytz types-six
     - name: Run mypy
       run: |
         mypy validation
@@ -103,7 +103,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mypy[python2] types-pytz types-six
+        pip install mypy[python2]==0.930 types-pytz types-six
     - name: Run mypy (python 2)
       run: |
         mypy --py2 validation
