@@ -12,7 +12,7 @@ from .string import (
 )
 
 from .datetime import (
-    validate_date, validate_datetime,
+    validate_date, validate_datetime, validate_timedelta,
 )
 
 from .datastructure import (
@@ -33,7 +33,7 @@ except ImportError:
 __all__ = [
     'validate_int', 'validate_float', 'validate_bool',
     'validate_text', 'validate_bytes',
-    'validate_date', 'validate_datetime',
+    'validate_date', 'validate_datetime', 'validate_timedelta',
     'validate_list', 'validate_set',
     'validate_mapping', 'validate_structure',
     'validate_tuple', 'validate_uuid',

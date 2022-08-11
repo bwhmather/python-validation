@@ -1,5 +1,5 @@
 from typing import overload, Callable, Optional
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 
 @overload
@@ -49,4 +49,43 @@ def validate_datetime() -> Callable[[datetime], None]:
 def validate_datetime(
     *, required: bool,
 ) -> Callable[[Optional[datetime]], None]:
+    ...
+
+
+@overload
+def validate_timedelta(
+    value: timedelta,
+    *,
+    max_value: Optional[timedelta] = None,
+    min_value: Optional[timedelta] = None,
+) -> None:
+    ...
+
+@overload
+def validate_timedelta(
+    value: Optional[timedelta],
+    *,
+    max_value: Optional[timedelta] = None,
+    min_value: Optional[timedelta] = None,
+    required: bool,
+) -> None:
+    ...
+
+
+@overload
+def validate_timedelta(
+    *,
+    max_value: Optional[timedelta] = None,
+    min_value: Optional[timedelta] = None,
+) -> Callable[[timedelta], None]:
+    ...
+
+
+@overload
+def validate_timedelta(
+    *,
+    max_value: Optional[timedelta] = None,
+    min_value: Optional[timedelta] = None,
+    required: bool,
+) -> Callable[[Optional[timedelta]], None]:
     ...
