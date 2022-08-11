@@ -150,7 +150,11 @@ class _timedelta_validator(object):
     def __init__(self, min_value, max_value, required):
         _validate_timedelta(min_value, required=False)
         _validate_timedelta(max_value, required=False)
-        if min_value > max_value:
+        if (
+            min_value is not None
+            and max_value is not None
+            and min_value > max_value
+        ):
             raise ValueError("minimum value greater than max value")
         _validate_bool(required)
         self.__min_value = min_value
